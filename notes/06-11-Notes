@@ -1,0 +1,21 @@
+
+
+exp ---> (use grammar) construct a parse tree --> 
+	1. tokenizer which splits the input stream into a list of tokens
+	2. parser which takes the list of tokens and constructs a parse tree/ast
+		from the list of tokens
+
+
+simple parse tree --> abstract syntax tree
+
+
+1. write parse function
+2. how to translate JS 
+3. Python exercises on trees
+
+
+Build data structures in trees
+1. binary search trees
+2. build heap
+
+3. 
