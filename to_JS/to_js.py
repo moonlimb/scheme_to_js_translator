@@ -22,16 +22,14 @@ def get_children(el):
 	return list(el)
 
 def get_text(el):
-	for i in el.iter():
-	
+	for i in el.iter()
+		print i
 
-"""
-Element as el
+
+"""Element as el
 <tag name="value" name2="value2">text</tag>
 el.tag - tag 
 el.text - gets the text content in/bw the tags
 el.items() - el's attributes as a seq of (name, value) pairs; 
 	not in order
 """
-
-
