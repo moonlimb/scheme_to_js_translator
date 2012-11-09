@@ -1,6 +1,7 @@
     
 <xml>
   <block type="procedures_defreturn" inline="false" x="270" y="96">
+	<title name="NAME">square</title>
     <value name="RETURN">
       <block type="math_arithmetic" inline="true">
         <title name="OP">MULTIPLY</title>
