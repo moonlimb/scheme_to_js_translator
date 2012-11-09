@@ -1,0 +1,21 @@
+    
+<xml>
+  <block type="procedures_defreturn" inline="false" x="270" y="96">
+    <value name="RETURN">
+      <block type="math_arithmetic" inline="true">
+        <title name="OP">MULTIPLY</title>
+        <value name="A">
+          <block type="variables_get">
+            <title name="VAR">x</title>
+          </block>
+        </value>
+        <value name="B">
+          <block type="variables_get">
+            <title name="VAR">x</title>
+          </block>
+        </value>
+      </block>
+    </value>
+  </block>
+</xml>
+
