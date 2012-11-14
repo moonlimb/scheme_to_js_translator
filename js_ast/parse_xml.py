@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 from sys import argv
 import re
-from js_ast import JsAST, FunctionDef, ReturnStmt, AddExpr
+from js_ast import JsAST, FunctionDef, ReturnStmt, Expr
 import operator as op
 #from __future__ import 
 
@@ -24,6 +24,10 @@ tree = ET.parse(xml_file)	# tree is ElementTree
 def get_children(node):
 	return list(node)
 
+#for nodes with single child
+def get_only_child(node):
+	return list(node)[0]
+
 def get_descendants(node):
 	return [e for e in node.iter()]
 
@@ -41,14 +45,6 @@ def get_name_att(node):
 def get_name_text_pair(el):
 	return (el.tag, el.text, el.items())
 
-"""Element
-<tag name="value" name2="value2">text</tag>
-el.tag - tag 
-el.text - gets the text content in/bw the tags
-el.items() - el's attributes as a seq of (name, value) pairs; 
-	not in order
-"""
-
 def return_empty_str(el):
 	return ""
 
@@ -60,23 +56,25 @@ def get_var(block):
 	return title.text	
 	
 # prefix calculator format
-def write_math(block):
+
 	#	<block type="math_arithmetic" inline="true">
 	#	  <title name="OP">ADD</title>
 	#	  <value name = "A">
 	#	    <block type="variables_get">
 	#	  <value name = "B">
 	#		...
-	bl_level_1 = get_children(block)
-	operator = op.basic[bl_level_1[0].text]
-	
-	# may need to check for the title name of the operator
+def get_block_from_value(node):
+	return get_children(node)[0]
 
-	# bl_level_2 is block types of value blocks
-	bl_level_2 = [list(child)[0] for child in bl_level_1[1:]]
-	result = [map(process_block, bl_level_2)]	
-	#return operator, result
-	return "operator %s, result %s" %s(operator, " ".join(result))
+def write_math(block):
+	level_1 = get_children(block)
+	operator = level_1[0].text	#ex. ADD
+	# may need to check for the title name of the operator
+	
+	#level_2 consists of block childs of value nodes
+	level_2 = [get_block_from_value(node) for node in level_1[1:]]
+	result= [process_block(block) for block in level_2]	
+	return operator, result[0], result[1]
 
 # <mutation><arg name="x"></arg>
 def get_args(mutation_node):
@@ -84,31 +82,24 @@ def get_args(mutation_node):
 	# args is a list of arguments (in string)
 	return args
 
+# <value name="RETURN"> <block..type="math_arithmetic"><title><value><value>
 def get_return_stmt(node):
-	pass
-	
+	if get_name_att(node)=='RETURN':
+		operator, left_operand, right_operand = process_block(get_only_child(node))
+		expr = Expr(operator, left_operand, right_operand)
+		return ReturnStmt(expr)
+
 def get_fn_name(title_node):
 	return get_text(title_node) 
 
+# will need to reassign 'value': get_return_stmt for functions with no return statements
 tags = {'mutation':get_args, 'title': get_fn_name, 'value': get_return_stmt}
 def write_fn(block):
 	# how to write an elegant code for this part?
 	nodes = get_children(block)
 	args, fn_name, return_stmt = [tags[n.tag](n) for n in nodes] 	
-	print args, fn_name, return_stmt
-
-# receives a fnc block as input
-	# makes js_ast class objects
-	# return a js_representation 
-
-#	blocks = get_children(root)
-#def write_block(block):
-#	pass
-# expression
-# argument
-# function name
-# left operand
-# right operand
+	fn = FunctionDef(fn_name, args, return_stmt)
+	print fn
 
 # write a function to combine blocks together
 
@@ -116,9 +107,6 @@ block_type = {"procedures_defreturn": write_fn, "math_arithmetic": write_math,
 "variables_get": get_var} 
 
 def process_block(node):
-	print node
-	print get_type(node)
-	print block_type[get_type(node)]
 	return block_type[get_type(node)](node)
 
 def parse_xml(root):

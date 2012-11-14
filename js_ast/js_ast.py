@@ -1,4 +1,4 @@
-import operators as op
+from operators import basic
 
 """
 class JavascriptAST:
@@ -34,16 +34,14 @@ class FunctionDef(object):
 		param = ', '.join(self.args)
 		return "function " + self.name + '(' + param + ')' + ' {\n    ' + str(self.return_stmt) +'\n}'	
 
-
-# make a general function for all expressions?
-# op.basic  
-class AddExpr(object):
+class Expr(object):
 	# operand could be variables or expressions
-	def __init__(self, left_operand, right_operand):
+	def __init__(self, operator, left_operand, right_operand):
+		self.operator= operator
 		self.left_operand=left_operand
 		self.right_operand=right_operand
-	def __str__(self):
-		return str(self.left_operand) + ' + ' + str(self.right_operand)
+	def __str__(self):	
+		return str(self.left_operand) + basic[self.operator] + str(self.right_operand)
 
 class ReturnStmt(object):
 	def __init__(self, expr):
