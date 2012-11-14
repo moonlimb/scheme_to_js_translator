@@ -1,4 +1,6 @@
 # file containing decorator / helper functions
+# Q: Use decorators/wrapper function to add curly braces?
+
 
 def make_fcn(fn):
 	def wrapper():

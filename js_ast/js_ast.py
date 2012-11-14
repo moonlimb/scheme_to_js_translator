@@ -1,7 +1,29 @@
+import operators as op
+
 """
 class JavascriptAST:
 	def __init__(self)
+
 """
+"""
+	@add_curly_braces
+	def get_function_body(op_token, args):
+		operator = op.basic[op_token]
+		body = operator.join(args)
+		return body	
+	       
+	# element's children are argument nodes 
+	# ex. <arg name = "x"/>
+	def make_params(parent_of_args):
+    	args = [arg.attrib['name'] for arg in list(parent_of_args)]
+    	return '('+ ", ".join(args) + ')'
+	
+"""
+class JsAST:
+	def __init__(self, code):
+		self.code = code 
+	def __str__(self):
+		return '\n'.join(self.code)
 
 class FunctionDef(object):
 	def __init__(self, name, args, return_stmt):
@@ -12,6 +34,9 @@ class FunctionDef(object):
 		param = ', '.join(self.args)
 		return "function " + self.name + '(' + param + ')' + ' {\n    ' + str(self.return_stmt) +'\n}'	
 
+
+# make a general function for all expressions?
+# op.basic  
 class AddExpr(object):
 	# operand could be variables or expressions
 	def __init__(self, left_operand, right_operand):
