@@ -19,22 +19,52 @@ class JavascriptAST:
     	return '('+ ", ".join(args) + ')'
 	
 """
-class JsAST:
+class JsAST(object):
+	# code is a list of different parts of the code
 	def __init__(self, code):
-		self.code = code 
+		self.code = code
 	def __str__(self):
-		return '\n'.join(self.code)
+		str_code = [str(chunk) for chunk in self.code]
+		return '\n\n'.join(str_code)
+
+class IfStmt(object):
+	def __init__(self, if_type, condition, stmt):
+		self.if_type= if_type
+		self.condition = condition
+		self.stmt = stmt
+	def __str__(self):
+		return "%s (%s) {\n%s\n}" %(self.if_type, self.condition, self.stmt)
+
+class ElseIfs(object):
+	def __init__(self, ls_else_if):
+		self.ls_else_if = ls_else_if
+	def __str__(self):
+		return ' '.join[ls_else_if]
+
+class ElseStmt(object):
+	def __str__(self):
+		return "else {\n%s\n}" %s(self.stmt)
+	
+# write a decorator for condition: '(' cond ')'
+# write a decorator for stmt: '{' and '}'
+class Conditional(object):
+	def __init__(self, if_stmt, else_stmt):
+		self.if_stmt= if_stmt
+		self.else_if_ls = else_if_ls
+		self.else_stmt = else_stmt
+	def __str__(self):
+		return "%s%s %s" %(str(if_stmt), str(ls_else_if), str(else_stmt))
 
 class FunctionDef(object):
-	def __init__(self, name, args, return_stmt):
+	def __init__(self, name, args, stmt):
 		self.name = name
 		self.args = args	#args is a list
-		self.return_stmt = return_stmt
+		self.stmt = stmt
 	def __str__(self):
 		param = ', '.join(self.args)
-		return "function " + self.name + '(' + param + ')' + ' {\n    ' + str(self.return_stmt) +'\n}'	
+		return "function " + self.name + '(' + param + ')' + ' {\n    ' + str(self.stmt) +'\n}'	
 
-class Expr(object):
+class MathExpr(object):
 	# operand could be variables or expressions
 	def __init__(self, operator, left_operand, right_operand):
 		self.operator= operator
@@ -43,8 +73,15 @@ class Expr(object):
 	def __str__(self):	
 		return str(self.left_operand) + basic[self.operator] + str(self.right_operand)
 
-class ReturnStmt(object):
+class Stmt(object):
 	def __init__(self, expr):
 		self.expr = expr
+	
+# use decorators to add wrapper to expr? 
+class PrintStmt(Stmt):
+	def __str__(self):
+		return "    console.log('" + str(self.expr) + "');"
+	
+class ReturnStmt(Stmt):
 	def __str__(self):
 		return "return " + str(self.expr) + ";"

@@ -1,9 +1,10 @@
+#from __future__ import print_function 
 import xml.etree.ElementTree as ET
 from sys import argv
 import re
-from js_ast import JsAST, FunctionDef, ReturnStmt, Expr
+from js_ast import JsAST, FunctionDef, Stmt, PrintStmt, ReturnStmt, MathExpr, IfStmt
 import operator as op
-#from __future__ import 
+import logging
 
 #op.basic is a dictionary of basic operators
 #from decorate import add_curly_braces
@@ -38,23 +39,14 @@ def get_type(block):
 def get_text(node):
 	return node.text
 
-def get_name_att(node):
+def get_name(node):
 	return node.attrib['name']
-	
-# given a single element, return its name and text pair
-def get_name_text_pair(el):
-	return (el.tag, el.text, el.items())
 
-def return_empty_str(el):
-	return ""
+# get_var and get_num calls get_value
+def get_value(block):
+	title = list(block)[0]
+	return title.text
 
-def get_var(block):
-	# <block type="variables_get">
-	#  <title name="VAR">x</title>
-	# </block>
-	title = list(block)[0]	# may not be true all the time
-	return title.text	
-	
 # prefix calculator format
 
 	#	<block type="math_arithmetic" inline="true">
@@ -78,33 +70,56 @@ def write_math(block):
 
 # <mutation><arg name="x"></arg>
 def get_args(mutation_node):
-	args = [get_name_att(arg) for arg in get_children(mutation_node)]
+	args = [get_name(arg) for arg in get_children(mutation_node)]
 	# args is a list of arguments (in string)
 	return args
 
 # <value name="RETURN"> <block..type="math_arithmetic"><title><value><value>
 def get_return_stmt(node):
-	if get_name_att(node)=='RETURN':
+	if get_name(node)=='RETURN':
 		operator, left_operand, right_operand = process_block(get_only_child(node))
-		expr = Expr(operator, left_operand, right_operand)
-		return ReturnStmt(expr)
+		math_expr = MathExpr(operator, left_operand, right_operand)
+		return ReturnStmt(math_expr)
+
+def get_print_stmt(node):
+	if get_name(node) == ' ':
+		pass		
 
 def get_fn_name(title_node):
 	return get_text(title_node) 
 
+#fix this statement!!
+def process_stmt(node):
+	process_block(get_only_child(node))
+	print "processing stmt"
+
+#return process_block(get_only_child(node))
 # will need to reassign 'value': get_return_stmt for functions with no return statements
-tags = {'mutation':get_args, 'title': get_fn_name, 'value': get_return_stmt}
+
+
+tags = {'mutation':get_args, 'title': get_fn_name, 'value': get_return_stmt, 'statement': process_stmt }
+# create a helper fn for write_fn and write_no_return_fn
 def write_fn(block):
 	# how to write an elegant code for this part?
 	nodes = get_children(block)
 	args, fn_name, return_stmt = [tags[n.tag](n) for n in nodes] 	
 	fn = FunctionDef(fn_name, args, return_stmt)
-	print fn
+	return fn
 
+def write_no_return_fn(block):
+	nodes = get_children(block)
+	args, fn_name, print_stmt = [tags[n.tag](n) for n in nodes]
+	fn = FunctionDef(fn_name, args, stmt)
+	return fn
+	
 # write a function to combine blocks together
 
-block_type = {"procedures_defreturn": write_fn, "math_arithmetic": write_math, 
-"variables_get": get_var} 
+conditional = {}
+def write_if(block):
+	#nodes = get_children(block)
+	print "need to process if statement"
+	
+block_type = {"procedures_defreturn": write_fn, "procedures_defnoreturn": write_no_return_fn, "controls_if": write_if, "text_print": get_print_stmt, "math_arithmetic": write_math, "logic_compare": write_math, "math_number": get_value, "variables_get": get_value, 'text': get_value} 
 
 def process_block(node):
 	return block_type[get_type(node)](node)
@@ -113,8 +128,8 @@ def parse_xml(root):
 	blocks = get_children(root)
 	processed_blocks = [process_block(b) for b in blocks]
 	# alt: processed_blocks = map(process_block, blocks)
-	# return JsAST(processed_blocks)
-	return "parsed xml"
+	#print "parsed xml. yay!"
+	return JsAST(processed_blocks)
 
 # return tag_to_function.get(root.tag)(child)
 # tag_to_function = {'xml': parse_xml, 'block': process_block}
@@ -131,9 +146,8 @@ def main():
 	script, xml_file = argv
 	tree = ET.parse(xml_file)   # tree is ElementTree
 	root = tree.getroot()		# root is Element
-	js_code = parse_xml(root)
-	print js_code
-	return js_code
+	js_code = parse_xml(root)	
+	print(js_code)	
 
 if __name__ == "__main__":
 	main()

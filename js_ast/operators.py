@@ -5,8 +5,7 @@
 # ex. math_arithmetic, variables_get 
 
 
+#block_type ={'procedures_defreturn': 'function', 'math_arithmetic':'', 'variables_get':''}
 
-block_type ={'procedures_defreturn': 'function', 'math_arithmetic':'', 'variables_get':''}
-
-basic = {'ADD': ' + ', 'MINUS': ' - ', 'MULTIPLY': ' * ', 'DIVIDE':' / ', 'POWER':' ** '}
-
+basic = {'ADD': ' + ', 'MINUS': ' - ', 'MULTIPLY': ' * ', 'DIVIDE':' / ', 'POWER':' ** ',
+'EQ': ' = ', 'GT': '>', 'GTE': '>=', 'LT':'<', 'LTE': '<='}
