@@ -108,18 +108,33 @@ def write_fn(block):
 
 def write_no_return_fn(block):
 	nodes = get_children(block)
-	args, fn_name, print_stmt = [tags[n.tag](n) for n in nodes]
+	args, fn_name, stmt = [tags[n.tag](n) for n in nodes]
 	fn = FunctionDef(fn_name, args, stmt)
 	return fn
 	
 # write a function to combine blocks together
 
 conditional = {}
-def write_if(block):
-	#nodes = get_children(block)
+def write_controls(block):
+	children=get_children(block)    
+	if children[0].tag == 'mutation':
+		mutation
+      <mutation elseif="1" else="1"></mutation>
+
+		if_stmt = IfStmt("if")
+
+class IfStmt(object):
+    def __init__(self, if_type, condition, stmt):
+        self.if_type= if_type
+        self.condition = condition
+        self.stmt = stmt
+    def __str__(self):
+        return "%s (%s) {\n%s\n}" %(self.if_type, self.condition, self.stmt)
+	
+#Conditional(if_stmt, else_stmt)	
 	print "need to process if statement"
 	
-block_type = {"procedures_defreturn": write_fn, "procedures_defnoreturn": write_no_return_fn, "controls_if": write_if, "text_print": get_print_stmt, "math_arithmetic": write_math, "logic_compare": write_math, "math_number": get_value, "variables_get": get_value, 'text': get_value} 
+block_type = {"procedures_defreturn": write_fn, "procedures_defnoreturn": write_no_return_fn, "controls_if": write_controls, "text_print": get_print_stmt, "math_arithmetic": write_math, "logic_compare": write_math, "math_number": get_value, "variables_get": get_value, 'text': get_value} 
 
 def process_block(node):
 	return block_type[get_type(node)](node)
