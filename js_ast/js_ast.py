@@ -1,11 +1,6 @@
 from operators import basic
 
 """
-class JavascriptAST:
-	def __init__(self)
-
-"""
-"""
 	@add_curly_braces
 	def get_function_body(op_token, args):
 		operator = op.basic[op_token]
@@ -27,6 +22,24 @@ class JsAST(object):
 		str_code = [str(chunk) for chunk in self.code]
 		return '\n\n'.join(str_code)
 
+class Assignment(object):
+	def __init__(self, var_name, value, is_declar):
+		self.var_name = var_name
+		self.value = value
+		self.is_declar = is_declar
+	def __str__(self):
+		assignment = '%s = %value' %(self.var_name, self.value) 
+		if self.is_declar:
+			return 'var %s' %assignment 
+		else:
+			return assignment
+
+class Declaration(object):
+	def __init__(self, var_name): 
+		self.var_name = var_name
+	def __str__(self):
+		return 'var %s;' %self.var_name
+
 class IfStmt(object):
 	def __init__(self, if_type, condition, stmt):
 		self.if_type= if_type
@@ -35,13 +48,15 @@ class IfStmt(object):
 	def __str__(self):
 		return "%s (%s) {\n%s\n}" %(self.if_type, self.condition, self.stmt)
 
-class ElseIfs(object):
+class ElseIf(object):
 	def __init__(self, ls_else_if):
 		self.ls_else_if = ls_else_if
 	def __str__(self):
 		return ' '.join[ls_else_if]
 
 class ElseStmt(object):
+	def __init__(self, stmt):
+		self.stmt = stmt
 	def __str__(self):
 		return "else {\n%s\n}" %s(self.stmt)
 	

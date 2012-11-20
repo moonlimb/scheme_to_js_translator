@@ -2,9 +2,25 @@
 import xml.etree.ElementTree as ET
 from sys import argv
 import re
-from js_ast import JsAST, FunctionDef, Stmt, PrintStmt, ReturnStmt, MathExpr, IfStmt, ElseStmt, ElseIf, Conditional
+from js_ast import JsAST, FunctionDef, Stmt, PrintStmt, ReturnStmt, MathExpr, IfStmt
+import operator as op
 import logging
+
+#op.basic is a dictionary of basic operators
 #from decorate import add_curly_braces
+
+script, xml_file = argv
+#python parse_xml.py filename.xml:
+#xml_file = raw_input('xml_filename >> ')
+
+filename = re.search('([^.]+)\.xml', xml_file).group(1)	
+# extracts the name of the xml file
+
+js_file = filename + ".js"	# same name, js version
+# js_file.write('hello')
+# need to make a file with js_file
+
+tree = ET.parse(xml_file)	# tree is ElementTree
 
 def get_children(node):
 	return list(node)
@@ -31,6 +47,14 @@ def get_value(block):
 	title = list(block)[0]
 	return title.text
 
+# prefix calculator format
+
+	#	<block type="math_arithmetic" inline="true">
+	#	  <title name="OP">ADD</title>
+	#	  <value name = "A">
+	#	    <block type="variables_get">
+	#	  <value name = "B">
+	#		...
 def get_block_from_value(node):
 	return get_children(node)[0]
 
@@ -72,6 +96,7 @@ def process_stmt(node):
 #return process_block(get_only_child(node))
 # will need to reassign 'value': get_return_stmt for functions with no return statements
 
+
 tags = {'mutation':get_args, 'title': get_fn_name, 'value': get_return_stmt, 'statement': process_stmt }
 # create a helper fn for write_fn and write_no_return_fn
 def write_fn(block):
@@ -86,52 +111,38 @@ def write_no_return_fn(block):
 	args, fn_name, stmt = [tags[n.tag](n) for n in nodes]
 	fn = FunctionDef(fn_name, args, stmt)
 	return fn
-
-def text_print(block):
-	block.get_children()	
-	print_stmt = PrintStmt()	
+	
 # write a function to combine blocks together
+
+conditional = {}
+def write_controls(block):
+	children=get_children(block)    
+	if children[0].tag == 'mutation':
+		print mutation.attrib
+      #<mutation elseif="1" else="1"></mutation>
+	#	if_stmt = IfStmt("if")
+"""
+class IfStmt(object):
+    def __init__(self, if_type, condition, stmt):
+        self.if_type= if_type
+        self.condition = condition
+        self.stmt = stmt
+    def __str__(self):
+        return "%s (%s) {\n%s\n}" %(self.if_type, self.condition, self.stmt)
+"""
+	
+#Conditional(if_stmt, else_stmt)	
+#	print "need to process if statement"
 	
 block_type = {"procedures_defreturn": write_fn, "procedures_defnoreturn": write_no_return_fn, "controls_if": write_controls, "text_print": get_print_stmt, "math_arithmetic": write_math, "logic_compare": write_math, "math_number": get_value, "variables_get": get_value, 'text': get_value} 
 
 def process_block(node):
 	return block_type[get_type(node)](node)
 
-def construct_if(condi):
-	pass
-	
-def write_controls(block):
-	children = get_children(block)    
-	first_node = children[0]
-	elseif_count, else_count = 0,0
-	if first_node.tag == 'mutation':
-		else_count = first_node.attrib.get('else',0)
-		elseif_count = first_node.attrib.get('elseif',0)	
-		print "else_count is %s" %else_count
-	print "elseif_count is $s" %elseif_count		
-		
-"""
-	if first_node.tag == 'mutation':
-		else_count = first_node.attrib.get('else',0)
-		elseif_count = first_node.attrib.get('elseif',0)	
-	cond=[]
-for n in xrange(0,2*(elseif_count+1)),2):
-		if_stmt = get_only_child(children[n])
-		stmt = get_only_child(children[n+1])		
-	"""	
-	
-#Conditional(if_stmt, else_stmt)	
-#	print "need to process if statement"
-
-def process_block(node):
-	return block_type[get_type(node)](node)
-
 def parse_xml(root):
 	blocks = get_children(root)
-	print blocks
 	processed_blocks = [process_block(b) for b in blocks]
-	print processed_blocks	
-# alt: processed_blocks = map(process_block, blocks)
+	# alt: processed_blocks = map(process_block, blocks)
 	#print "parsed xml. yay!"
 	return JsAST(processed_blocks)
 
@@ -150,6 +161,7 @@ def main():
 	script, xml_file = argv
 	tree = ET.parse(xml_file)   # tree is ElementTree
 	root = tree.getroot()		# root is Element
+	print root
 	js_code = parse_xml(root)	
 	print(js_code)	
 
