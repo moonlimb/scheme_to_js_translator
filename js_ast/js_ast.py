@@ -40,6 +40,10 @@ class Declaration(object):
 	def __str__(self):
 		return 'var %s;' %self.var_name
 
+class Stmt(object):
+	def __init__(self, expr):
+		self.expr = expr
+	
 class IfStmt(object):
 	def __init__(self, if_type, condition, stmt):
 		self.if_type= if_type
@@ -54,11 +58,9 @@ class ElseIf(object):
 	def __str__(self):
 		return ' '.join[ls_else_if]
 
-class ElseStmt(object):
-	def __init__(self, stmt):
-		self.stmt = stmt
+class ElseStmt(Stmt):
 	def __str__(self):
-		return "else {\n%s\n}" %s(self.stmt)
+		return "else {\n%s\n}" %s(self.expr)
 	
 # write a decorator for condition: '(' cond ')'
 # write a decorator for stmt: '{' and '}'
@@ -88,10 +90,6 @@ class MathExpr(object):
 	def __str__(self):	
 		return str(self.left_operand) + basic[self.operator] + str(self.right_operand)
 
-class Stmt(object):
-	def __init__(self, expr):
-		self.expr = expr
-	
 # use decorators to add wrapper to expr? 
 class PrintStmt(Stmt):
 	def __str__(self):

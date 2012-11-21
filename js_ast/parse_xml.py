@@ -31,16 +31,16 @@ def get_value(block):
 	title = list(block)[0]
 	return title.text
 
-def get_block_from_value(node):
-	return get_children(node)[0]
+#get_block_from_parent
+def get_block(node):
+	return get_only_child(node)
 
 def write_math(block):
 	level_1 = get_children(block)
 	operator = level_1[0].text	#ex. ADD
-	# may need to check for the title name of the operator
-	
+	# may need to check for the title name of the operator	
 	#level_2 consists of block childs of value nodes
-	level_2 = [get_block_from_value(node) for node in level_1[1:]]
+	level_2 = [get_block(node) for node in level_1[1:]]
 	result= [process_block(block) for block in level_2]	
 	return operator, result[0], result[1]
 
@@ -57,19 +57,12 @@ def get_return_stmt(node):
 		math_expr = MathExpr(operator, left_operand, right_operand)
 		return ReturnStmt(math_expr)
 
-def get_print_stmt(node):
-	if get_name(node) == ' ':
-		pass		
-
 def get_fn_name(title_node):
 	return get_text(title_node) 
 
-#fix this statement!!
 def process_stmt(node):
-	process_block(get_only_child(node))
-	print "processing stmt"
+	return process_block(get_only_child(node))
 
-#return process_block(get_only_child(node))
 # will need to reassign 'value': get_return_stmt for functions with no return statements
 
 tags = {'mutation':get_args, 'title': get_fn_name, 'value': get_return_stmt, 'statement': process_stmt }
@@ -87,52 +80,69 @@ def write_no_return_fn(block):
 	fn = FunctionDef(fn_name, args, stmt)
 	return fn
 
-def text_print(block):
-	block.get_children()	
-	print_stmt = PrintStmt()	
-# write a function to combine blocks together
-	
-block_type = {"procedures_defreturn": write_fn, "procedures_defnoreturn": write_no_return_fn, "controls_if": write_controls, "text_print": get_print_stmt, "math_arithmetic": write_math, "logic_compare": write_math, "math_number": get_value, "variables_get": get_value, 'text': get_value} 
+def make_print_stmt(block):
+	children = get_children(block)
+	for child in children:
+		if child.tag == 'block':
+			expr = process_block(child)
+			return PrintStmt(expr)
+
+def write_else():
+	pass
 
 def process_block(node):
 	return block_type[get_type(node)](node)
 
-def construct_if(condi):
+def process_stmt(stmt_block):
+	block = stmt_block.get_only_child()	
 	pass
 	
-def write_controls(block):
-	children = get_children(block)    
-	first_node = children[0]
-	elseif_count, else_count = 0,0
-	if first_node.tag == 'mutation':
-		else_count = first_node.attrib.get('else',0)
-		elseif_count = first_node.attrib.get('elseif',0)	
-		print "else_count is %s" %else_count
-	print "elseif_count is $s" %elseif_count		
-		
-"""
-	if first_node.tag == 'mutation':
-		else_count = first_node.attrib.get('else',0)
-		elseif_count = first_node.attrib.get('elseif',0)	
-	cond=[]
-for n in xrange(0,2*(elseif_count+1)),2):
-		if_stmt = get_only_child(children[n])
-		stmt = get_only_child(children[n+1])		
-	"""	
-	
-#Conditional(if_stmt, else_stmt)	
-#	print "need to process if statement"
+def process_cond():
+	pass
 
+
+def construct_if(if_do_pair):
+	else_stmt = None
+	if isinstance(if_do_pair[-1], str):
+		else_stmt = ElseStmt(if_do_pair.pop())
+		print else_stmt
+	print else_stmt
+
+def deconstruct_if(if_do_pair):
+	updated_pair=[]
+	for pair in if_do_pair:
+	   updated_pair.extend= [block(each) for each in pair]
+
+	
+# reverse() is O(n)
+def write_controls(block):
+	children = get_children(block)
+	children.reverse()   
+	if_do_pair =[]
+	while len(children) > 0:
+		current_child = children.pop()
+		if current_child.tag == 'value':
+			do_stmt = children.pop()
+			if_do_pair.append((current_child, do_stmt))
+		elif current_child.tag == 'statement':
+			if_do_pair.append(current_child)
+	for item in if_do_pair:
+		print item
+	return deconstruct_if(if_do_pair)
+
+block_type = {"procedures_defreturn": write_fn, "procedures_defnoreturn": write_no_return_fn, "controls_if": write_controls, "text_print": make_print_stmt, "math_arithmetic": write_math, "logic_compare": write_math, "math_number": get_value, "variables_get": get_value, 'text': get_value} 
+
+def process_block(node):
+	return block_type[get_type(node)](node)
 def process_block(node):
 	return block_type[get_type(node)](node)
 
 def parse_xml(root):
 	blocks = get_children(root)
-	print blocks
 	processed_blocks = [process_block(b) for b in blocks]
-	print processed_blocks	
+	#print processed_blocks	
 # alt: processed_blocks = map(process_block, blocks)
-	#print "parsed xml. yay!"
+	print "parsed xml. yay!"
 	return JsAST(processed_blocks)
 
 # return tag_to_function.get(root.tag)(child)
