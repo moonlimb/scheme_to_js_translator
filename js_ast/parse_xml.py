@@ -100,7 +100,6 @@ def process_stmt(stmt_block):
 def process_cond():
 	pass
 
-
 def construct_if(if_do_pair):
 	else_stmt = None
 	if isinstance(if_do_pair[-1], str):
@@ -108,12 +107,13 @@ def construct_if(if_do_pair):
 		print else_stmt
 	print else_stmt
 
-def deconstruct_if(if_do_pair):
+def deconstruct_if(if_stmt, do_stmt):
 	updated_pair=[]
 	for pair in if_do_pair:
-	   updated_pair.extend= [block(each) for each in pair]
+		print pair
+		#updated_pair.extend([process_block(each) for each in pair])
+		print "processing block"	
 
-	
 # reverse() is O(n)
 def write_controls(block):
 	children = get_children(block)
@@ -123,7 +123,7 @@ def write_controls(block):
 		current_child = children.pop()
 		if current_child.tag == 'value':
 			do_stmt = children.pop()
-			if_do_pair.append((current_child, do_stmt))
+			if_do_pair.extend(deconstruct_if(current_child,do_stmt))	
 		elif current_child.tag == 'statement':
 			if_do_pair.append(current_child)
 	for item in if_do_pair:
@@ -132,8 +132,6 @@ def write_controls(block):
 
 block_type = {"procedures_defreturn": write_fn, "procedures_defnoreturn": write_no_return_fn, "controls_if": write_controls, "text_print": make_print_stmt, "math_arithmetic": write_math, "logic_compare": write_math, "math_number": get_value, "variables_get": get_value, 'text': get_value} 
 
-def process_block(node):
-	return block_type[get_type(node)](node)
 def process_block(node):
 	return block_type[get_type(node)](node)
 
