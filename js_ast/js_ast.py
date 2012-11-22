@@ -22,6 +22,15 @@ class JsAST(object):
 		str_code = [str(chunk) for chunk in self.code]
 		return '\n\n'.join(str_code)
 
+class Expression(object):
+	def __init__(self, 
+
+class Statement(object):
+	def __init__(self, expr):
+		self.expr = expr
+	def __str__(self):
+		return "%s" %self.expr	
+
 class Assignment(object):
 	def __init__(self, var_name, value, is_declar):
 		self.var_name = var_name
@@ -34,16 +43,24 @@ class Assignment(object):
 		else:
 			return assignment
 
+class ValueAssignment(object):
+	def __init__(self, value):
+		self.value = value
+	def __str__(self):
+		pass
+
+class VariableAssigment(object):
+	def __init__(self, var_name, expr):
+		self.var_name = var_name	
+	def __str__(self):
+		pass
+
 class Declaration(object):
 	def __init__(self, var_name): 
 		self.var_name = var_name
 	def __str__(self):
 		return 'var %s;' %self.var_name
 
-class Stmt(object):
-	def __init__(self, expr):
-		self.expr = expr
-	
 class IfStmt(object):
 	def __init__(self, if_type, condition, stmt):
 		self.if_type= if_type

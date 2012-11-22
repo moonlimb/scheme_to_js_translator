@@ -100,32 +100,44 @@ def process_stmt(stmt_block):
 def process_cond():
 	pass
 
-def construct_if(if_do_pair):
+def deconstruct_if(if_stmt, do_stmt):
+		
+	updated_pair=[]
+
+
+control_pair = {}
+def construct_if(if_cond, do_stmt):
+	return IfStmt('if',if_cond, do_stmt):
+
+def construct_else(do_stmti):w
+
 	else_stmt = None
 	if isinstance(if_do_pair[-1], str):
 		else_stmt = ElseStmt(if_do_pair.pop())
 		print else_stmt
 	print else_stmt
 
-def deconstruct_if(if_stmt, do_stmt):
-	updated_pair=[]
-	for pair in if_do_pair:
-		print pair
-		#updated_pair.extend([process_block(each) for each in pair])
-		print "processing block"	
+#write_controls(block):
+# receives a block containing control_xml
+# loops through children of block
+# for all if and elseif stmts, 
+# send  
 
 # reverse() is O(n)
 def write_controls(block):
 	children = get_children(block)
 	children.reverse()   
-	if_do_pair =[]
+	control_stmt=[]
 	while len(children) > 0:
 		current_child = children.pop()
 		if current_child.tag == 'value':
 			do_stmt = children.pop()
-			if_do_pair.extend(deconstruct_if(current_child,do_stmt))	
+			if_type = 'elseif'
+			if value.get_name()=='IF0':
+				control_stmt.extend(construct_if(current_child,do_stmt))	
+				
 		elif current_child.tag == 'statement':
-			if_do_pair.append(current_child)
+			control_stmt.extend(construct_else())
 	for item in if_do_pair:
 		print item
 	return deconstruct_if(if_do_pair)
