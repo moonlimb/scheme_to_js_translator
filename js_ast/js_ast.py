@@ -22,63 +22,80 @@ class JsAST(object):
 		str_code = [str(chunk) for chunk in self.code]
 		return '\n\n'.join(str_code)
 
+# Expression is a combination of values, variables, operators, and function calls
 class Expression(object):
-	def __init__(self, 
-
-class Statement(object):
 	def __init__(self, expr):
-		self.expr = expr
+		self.expr = expr 
 	def __str__(self):
-		return "%s" %self.expr	
+		return '%s' %self.expr
+# ex. if (stmt)
+# Statement is an instruction Python interpreter can execute
+class Statement(object):
+	def __init__(self, stmt):
+		self.stmt = stmt
+	def __str__(self):
+		return "%s" %self.stmt
 
-class Assignment(object):
-	def __init__(self, var_name, value, is_declar):
-		self.var_name = var_name
+class ValueExpr(expr):
+	def __init__(self, value):
+		self.value = value
+
+class VariableExpr(expr):
+	def __init__(self, name):
+		self.name = name	
+
+"""
+class DeclarationStmt(Statement):
+	def __init__(self, var_expr): 
+		self.var_expr = var_expr
+	def __str__(self):
+		return 'var %s;' %str(self.var_expr)
+
+class AssignmentStmt(Statement)
+	def __init__(self, var_expr, value, is_declaration):
+		self.var_expr = var_expr
 		self.value = value
 		self.is_declar = is_declar
 	def __str__(self):
-		assignment = '%s = %value' %(self.var_name, self.value) 
-		if self.is_declar:
+		assignment = '%s = %value' %(self.var_expr, self.value) 
+		if self.is_declaration:
 			return 'var %s' %assignment 
 		else:
 			return assignment
-
-class ValueAssignment(object):
-	def __init__(self, value):
-		self.value = value
-	def __str__(self):
-		pass
-
-class VariableAssigment(object):
-	def __init__(self, var_name, expr):
-		self.var_name = var_name	
-	def __str__(self):
-		pass
-
-class Declaration(object):
-	def __init__(self, var_name): 
-		self.var_name = var_name
-	def __str__(self):
-		return 'var %s;' %self.var_name
-
-class IfStmt(object):
-	def __init__(self, if_type, condition, stmt):
-		self.if_type= if_type
-		self.condition = condition
+"""
+class ElseIfStmt(Statement):
+	def __init__(self, cond_expr, stmt)
+		self.cond_expr = cond_expr
 		self.stmt = stmt
 	def __str__(self):
-		return "%s (%s) {\n%s\n}" %(self.if_type, self.condition, self.stmt)
+		return 
+"""else if (%s) {
+       %s
+   };""" %(str(cond_expr), str(stmt))
 
-class ElseIf(object):
-	def __init__(self, ls_else_if):
-		self.ls_else_if = ls_else_if
+class ElseStmt(Statement):
 	def __str__(self):
-		return ' '.join[ls_else_if]
-
-class ElseStmt(Stmt):
-	def __str__(self):
-		return "else {\n%s\n}" %s(self.expr)
+		return 
+"""else {
+       %s
+   };" %(str(self.expr))
 	
+# what is body made up of? combination of expressions and statements
+# usually a statement?
+# return a+1
+# return expr
+class IfStmt(object):
+	def __init__(self, cond_expr, stmt):
+		self.if_type= if_type
+		self.cond_expr = cond_expr
+		self.stmt = stmt
+	def __str__(self):
+		return """
+		if () {
+		}
+		%s
+		%s	%({\n%s\n}" %(self.if_type, self.condition, self.stmt)
+"""
 # write a decorator for condition: '(' cond ')'
 # write a decorator for stmt: '{' and '}'
 class Conditional(object):
