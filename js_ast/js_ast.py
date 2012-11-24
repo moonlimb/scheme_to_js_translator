@@ -28,6 +28,7 @@ class Expression(object):
 		self.expr = expr 
 	def __str__(self):
 		return '%s' %self.expr
+
 # ex. if (stmt)
 # Statement is an instruction Python interpreter can execute
 class Statement(object):
@@ -36,11 +37,11 @@ class Statement(object):
 	def __str__(self):
 		return "%s" %self.stmt
 
-class ValueExpr(expr):
+class ValueExpr(Expression):
 	def __init__(self, value):
 		self.value = value
 
-class VariableExpr(expr):
+class VariableExpr(Expression):
 	def __init__(self, name):
 		self.name = name	
 
@@ -63,48 +64,39 @@ class AssignmentStmt(Statement)
 		else:
 			return assignment
 """
+
 class ElseIfStmt(Statement):
-	def __init__(self, cond_expr, stmt)
+	def __init__(self, cond_expr, stmt):
 		self.cond_expr = cond_expr
 		self.stmt = stmt
 	def __str__(self):
-		return 
-"""else if (%s) {
+		return """else if (%s) {
        %s
-   };""" %(str(cond_expr), str(stmt))
+   };""" %(str(self.cond_expr), str(self.stmt))
 
 class ElseStmt(Statement):
 	def __str__(self):
 		return 
 """else {
        %s
-   };" %(str(self.expr))
+   }; %(str(self.expr))
+"""
 	
 # what is body made up of? combination of expressions and statements
 # usually a statement?
 # return a+1
 # return expr
 class IfStmt(object):
-	def __init__(self, cond_expr, stmt):
-		self.if_type= if_type
-		self.cond_expr = cond_expr
+	def __init__(self, cond_expr, body_stmt, elses):
+		self.cond_expr = cond_expr	# cond_expr is cond_exprition expression
+		self.body_stmt = body_stmt	# body_stmt is if statmenet body_stmt
+		self.elses = elses 	#list of elseif and else stmts	
 		self.stmt = stmt
 	def __str__(self):
-		return """
-		if () {
-		}
-		%s
-		%s	%({\n%s\n}" %(self.if_type, self.condition, self.stmt)
-"""
-# write a decorator for condition: '(' cond ')'
-# write a decorator for stmt: '{' and '}'
-class Conditional(object):
-	def __init__(self, if_stmt, else_stmt):
-		self.if_stmt= if_stmt
-		self.else_if_ls = else_if_ls
-		self.else_stmt = else_stmt
-	def __str__(self):
-		return "%s%s %s" %(str(if_stmt), str(ls_else_if), str(else_stmt))
+		return """if (%s) {
+       %s
+   } %s %s 
+""" %(self.cond_expr, ' '.join([str(else_if) for else_if in self.elses]), str(self.body_stmt))
 
 class FunctionDef(object):
 	def __init__(self, name, args, stmt):
@@ -113,7 +105,7 @@ class FunctionDef(object):
 		self.stmt = stmt
 	def __str__(self):
 		param = ', '.join(self.args)
-		return "function " + self.name + '(' + param + ')' + ' {\n    ' + str(self.stmt) +'\n}'	
+		return "function " + str(self.name) + '(' + param + ')' + ' {\n    ' + str(self.stmt) +'\n}'	
 
 class MathExpr(object):
 	# operand could be variables or expressions
@@ -125,10 +117,10 @@ class MathExpr(object):
 		return str(self.left_operand) + basic[self.operator] + str(self.right_operand)
 
 # use decorators to add wrapper to expr? 
-class PrintStmt(Stmt):
+class PrintStmt(Statement):
 	def __str__(self):
 		return "    console.log('" + str(self.expr) + "');"
 	
-class ReturnStmt(Stmt):
+class ReturnStmt(Statement):
 	def __str__(self):
 		return "return " + str(self.expr) + ";"

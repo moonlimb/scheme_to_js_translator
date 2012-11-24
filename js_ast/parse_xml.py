@@ -2,7 +2,7 @@
 import xml.etree.ElementTree as ET
 from sys import argv
 import re
-from js_ast import JsAST, FunctionDef, Stmt, PrintStmt, ReturnStmt, MathExpr, IfStmt, ElseStmt, ElseIf, Conditional
+from js_ast import JsAST, FunctionDef, Expression, Statement, PrintStmt, ReturnStmt, MathExpr, IfStmt, ElseStmt, ElseIfStmt
 import logging
 #from decorate import add_curly_braces
 
@@ -81,47 +81,40 @@ def write_no_return_fn(block):
 	return fn
 
 def make_print_stmt(block):
-	children = get_children(block)
+	print block	
+	children= get_descendants(block)
 	for child in children:
-		if child.tag == 'block':
+		print child.tag
+"""		if child.tag == 'block':
 			expr = process_block(child)
+			print expr	
 			return PrintStmt(expr)
-
-def write_else():
-	pass
+"""
 
 def process_block(node):
 	return block_type[get_type(node)](node)
 
+
+def write_else():
+	pass
+
+
 def process_stmt(stmt_block):
 	block = stmt_block.get_only_child()	
 	pass
-	
-def process_cond():
-	pass
 
 def deconstruct_if(if_stmt, do_stmt):
-		
-	updated_pair=[]
+	pass
 
-
-control_pair = {}
 def construct_if(if_cond, do_stmt):
-	return IfStmt('if',if_cond, do_stmt):
-
-def construct_else(do_stmti):w
-
-	else_stmt = None
-	if isinstance(if_do_pair[-1], str):
-		else_stmt = ElseStmt(if_do_pair.pop())
-		print else_stmt
-	print else_stmt
-
-#write_controls(block):
-# receives a block containing control_xml
-# loops through children of block
-# for all if and elseif stmts, 
-# send  
+	pass
+	#	if value.get_name()=='IF0':
+#				control_stmt.extend(construct_if(current_child,do_stmt))	
+	
+def process_cond(parent_block):
+	print parent_block
+	print get_only_child(parent_block)
+	return process_block(get_only_child(parent_block))
 
 # reverse() is O(n)
 def write_controls(block):
@@ -132,20 +125,11 @@ def write_controls(block):
 		current_child = children.pop()
 		if current_child.tag == 'value':
 			do_stmt = children.pop()
-			if_type = 'elseif'
-			if value.get_name()=='IF0':
-				control_stmt.extend(construct_if(current_child,do_stmt))	
-				
 		elif current_child.tag == 'statement':
-			control_stmt.extend(construct_else())
-	for item in if_do_pair:
-		print item
-	return deconstruct_if(if_do_pair)
+			control_stmt.append(process_cond(current_child))
+	return "wrote control statements" + str(control_stmt[0])
 
 block_type = {"procedures_defreturn": write_fn, "procedures_defnoreturn": write_no_return_fn, "controls_if": write_controls, "text_print": make_print_stmt, "math_arithmetic": write_math, "logic_compare": write_math, "math_number": get_value, "variables_get": get_value, 'text': get_value} 
-
-def process_block(node):
-	return block_type[get_type(node)](node)
 
 def parse_xml(root):
 	blocks = get_children(root)
