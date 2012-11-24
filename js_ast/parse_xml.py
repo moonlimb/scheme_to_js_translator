@@ -80,24 +80,23 @@ def write_no_return_fn(block):
 	fn = FunctionDef(fn_name, args, stmt)
 	return fn
 
-def make_print_stmt(block):
-	print block	
-	children= get_descendants(block)
-	for child in children:
-		print child.tag
-"""		if child.tag == 'block':
-			expr = process_block(child)
-			print expr	
-			return PrintStmt(expr)
-"""
 
 def process_block(node):
 	return block_type[get_type(node)](node)
 
+def make_print_stmt(block):
+	children= get_descendants(block)
+	for child in children:
+		print child.tag
+		if child.tag == 'block':
+			print child
+			#expr = process_block(child)
+			expr = 'debug'	
+			print expr	
+			#return PrintStmt(expr)
 
 def write_else():
 	pass
-
 
 def process_stmt(stmt_block):
 	block = stmt_block.get_only_child()	
@@ -112,8 +111,8 @@ def construct_if(if_cond, do_stmt):
 #				control_stmt.extend(construct_if(current_child,do_stmt))	
 	
 def process_cond(parent_block):
-	print parent_block
-	print get_only_child(parent_block)
+	#print parent_block
+	#print get_only_child(parent_block)
 	return process_block(get_only_child(parent_block))
 
 # reverse() is O(n)
