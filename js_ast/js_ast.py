@@ -20,7 +20,7 @@ class JsAST(object):
 		self.code = code
 	def __str__(self):
 		str_code = [str(chunk) for chunk in self.code]
-		return '\n\n'.join(str_code)
+		return '\n'.join(str_code)
 
 # Expression is a combination of values, variables, operators, and function calls
 class Expression(object):
@@ -66,37 +66,31 @@ class AssignmentStmt(Statement)
 """
 
 class ElseIfStmt(Statement):
-	def __init__(self, cond_expr, stmt):
-		self.cond_expr = cond_expr
+	def __init__(self, cond, stmt):
+		self.cond = cond
 		self.stmt = stmt
 	def __str__(self):
 		return """else if (%s) {
        %s
-   };""" %(str(self.cond_expr), str(self.stmt))
+   };""" %(str(self.cond), str(self.stmt))
 
 class ElseStmt(Statement):
 	def __str__(self):
-		return 
-"""else {
+		return """else {
        %s
    }; %(str(self.expr))
 """
-	
-# what is body made up of? combination of expressions and statements
-# usually a statement?
-# return a+1
-# return expr
+
 class IfStmt(object):
-	def __init__(self, cond_expr, body_stmt, elses):
-		self.cond_expr = cond_expr	# cond_expr is cond_exprition expression
-		self.body_stmt = body_stmt	# body_stmt is if statmenet body_stmt
+	def __init__(self, cond, body, elses):
+		self.cond = cond	# cond is expression
+		self.body = body	# body is if statement's body 
 		self.elses = elses 	#list of elseif and else stmts	
-		self.stmt = stmt
 	def __str__(self):
 		return """if (%s) {
        %s
    } %s %s 
-""" %(self.cond_expr, ' '.join([str(else_if) for else_if in self.elses]), str(self.body_stmt))
+""" %(self.cond, ' '.join([str(else_if) for else_if in self.elses]), str(self.body))
 
 class FunctionDef(object):
 	def __init__(self, name, args, stmt):
@@ -110,17 +104,17 @@ class FunctionDef(object):
 class MathExpr(object):
 	# operand could be variables or expressions
 	def __init__(self, operator, left_operand, right_operand):
-		self.operator= operator
-		self.left_operand=left_operand
-		self.right_operand=right_operand
+		self.operator = operator
+		self.left_operand = left_operand
+		self.right_operand = right_operand
 	def __str__(self):	
 		return str(self.left_operand) + basic[self.operator] + str(self.right_operand)
 
 # use decorators to add wrapper to expr? 
 class PrintStmt(Statement):
 	def __str__(self):
-		return "    console.log('" + str(self.expr) + "');"
+		return "console.log('" + str(self.stmt) + "');"
 	
 class ReturnStmt(Statement):
 	def __str__(self):
-		return "return " + str(self.expr) + ";"
+		return "return " + str(super(Statement,expr)) + ";"

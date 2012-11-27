@@ -6,6 +6,7 @@ from js_ast import JsAST, FunctionDef, Expression, Statement, PrintStmt, ReturnS
 import logging
 #from decorate import add_curly_braces
 
+block_type={}
 def get_children(node):
 	return list(node)
 
@@ -80,20 +81,15 @@ def write_no_return_fn(block):
 	fn = FunctionDef(fn_name, args, stmt)
 	return fn
 
-
-def process_block(node):
+def process_block_internal(node):
 	return block_type[get_type(node)](node)
 
+
 def make_print_stmt(block):
-	children= get_descendants(block)
-	for child in children:
-		print child.tag
-		if child.tag == 'block':
-			print child
-			#expr = process_block(child)
-			expr = 'debug'	
-			print expr	
-			#return PrintStmt(expr)
+	children= get_only_child(block) 
+	if children.tag == 'value':
+		expr = process_block_internal(get_only_child(children))
+		return PrintStmt(expr)
 
 def write_else():
 	pass
@@ -102,40 +98,44 @@ def process_stmt(stmt_block):
 	block = stmt_block.get_only_child()	
 	pass
 
-def deconstruct_if(if_stmt, do_stmt):
-	pass
+def build_if(if_node, do_node):
+	process_controls(if_node)
+	if if_node.attrib['name'] == 'IF0':
+		return ()
+	else:
+		return ElseIfStmt()			
 
-def construct_if(if_cond, do_stmt):
-	pass
-	#	if value.get_name()=='IF0':
-#				control_stmt.extend(construct_if(current_child,do_stmt))	
-	
-def process_cond(parent_block):
-	#print parent_block
-	#print get_only_child(parent_block)
+def build_else(control_node):
+	return ElseStmt(process_controls(control_node))
+
+def process_block(node):
+	return block_type[get_type(node)](node)
+
+def process_controls(parent_block):
 	return process_block(get_only_child(parent_block))
+
+def build_control(stmts):
+	condition = stmts[0][0]
+	body = stmts[0][1]	
+	elses = stmts[2:] if len(stmts)>2 else ""	
+	return IfStmt(condition, body, elses)
 
 # reverse() is O(n)
 def write_controls(block):
-	children = get_children(block)
-	children.reverse()   
-	control_stmt=[]
-	while len(children) > 0:
-		current_child = children.pop()
-		if current_child.tag == 'value':
-			do_stmt = children.pop()
-		elif current_child.tag == 'statement':
-			control_stmt.append(process_cond(current_child))
-	return "wrote control statements" + str(control_stmt[0])
-
-block_type = {"procedures_defreturn": write_fn, "procedures_defnoreturn": write_no_return_fn, "controls_if": write_controls, "text_print": make_print_stmt, "math_arithmetic": write_math, "logic_compare": write_math, "math_number": get_value, "variables_get": get_value, 'text': get_value} 
+	nodes = get_children(block)
+	nodes.reverse() 
+	stmts=[]
+	while len(stmts) > 0:
+		node = nodes.pop()
+		if node.tag == 'value':
+			stmts.append(build_if(node, nodes.pop()))
+		elif node.tag == 'statement':
+			stmts.append(build_else(node))
+	return build_control(stmts)
 
 def parse_xml(root):
 	blocks = get_children(root)
-	processed_blocks = [process_block(b) for b in blocks]
-	#print processed_blocks	
-# alt: processed_blocks = map(process_block, blocks)
-	print "parsed xml. yay!"
+	processed_blocks = [process_block(b) for b in blocks]	#map(process_block, blocks)
 	return JsAST(processed_blocks)
 
 # return tag_to_function.get(root.tag)(child)
@@ -158,3 +158,7 @@ def main():
 
 if __name__ == "__main__":
 	main()
+
+
+block_type = {"procedures_defreturn": write_fn, "procedures_defnoreturn": write_no_return_fn, "controls_if": write_controls, "text_print": make_print_stmt, "math_arithmetic": write_math, "logic_compare": write_math, "math_number": get_value, "variables_get": get_value, 'text': get_value} 
+
