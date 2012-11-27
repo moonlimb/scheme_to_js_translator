@@ -7,6 +7,7 @@ import logging
 #from decorate import add_curly_braces
 
 block_type={}
+
 def get_children(node):
 	return list(node)
 
@@ -36,14 +37,15 @@ def get_value(block):
 def get_block(node):
 	return get_only_child(node)
 
+def construct_math_expr(operator, l_operand, r_operand):
+	return MathExpr(operator, l_operand, r_operand)
+
 def write_math(block):
 	level_1 = get_children(block)
 	operator = level_1[0].text	#ex. ADD
-	# may need to check for the title name of the operator	
-	#level_2 consists of block childs of value nodes
-	level_2 = [get_block(node) for node in level_1[1:]]
+	level_2 = [get_block(node) for node in level_1[1:]]	#level_2 consists of block childs of value nodes
 	result= [process_block(block) for block in level_2]	
-	return operator, result[0], result[1]
+	return construct_math_expr(operator, result[0], result[1])
 
 # <mutation><arg name="x"></arg>
 def get_args(mutation_node):
@@ -54,8 +56,7 @@ def get_args(mutation_node):
 # <value name="RETURN"> <block..type="math_arithmetic"><title><value><value>
 def get_return_stmt(node):
 	if get_name(node)=='RETURN':
-		operator, left_operand, right_operand = process_block(get_only_child(node))
-		math_expr = MathExpr(operator, left_operand, right_operand)
+		math_expr = process_block(get_only_child(node))
 		return ReturnStmt(math_expr)
 
 def get_fn_name(title_node):
@@ -84,7 +85,6 @@ def write_no_return_fn(block):
 def process_block_internal(node):
 	return block_type[get_type(node)](node)
 
-
 def make_print_stmt(block):
 	children= get_only_child(block) 
 	if children.tag == 'value':
@@ -99,11 +99,10 @@ def process_stmt(stmt_block):
 	pass
 
 def build_if(if_node, do_node):
-	process_controls(if_node)
 	if if_node.attrib['name'] == 'IF0':
-		return ()
+		return (process_controls(if_node), process_controls(do_node))
 	else:
-		return ElseIfStmt()			
+		return ElseIfStmt(process_controls(if_node), process_controls(do_node))
 
 def build_else(control_node):
 	return ElseStmt(process_controls(control_node))
@@ -117,7 +116,8 @@ def process_controls(parent_block):
 def build_control(stmts):
 	condition = stmts[0][0]
 	body = stmts[0][1]	
-	elses = stmts[2:] if len(stmts)>2 else ""	
+	elses = stmts[1:] if len(stmts)>1 else [""]
+#	print condition, body, elses
 	return IfStmt(condition, body, elses)
 
 # reverse() is O(n)
@@ -125,7 +125,7 @@ def write_controls(block):
 	nodes = get_children(block)
 	nodes.reverse() 
 	stmts=[]
-	while len(stmts) > 0:
+	while len(nodes) > 0:
 		node = nodes.pop()
 		if node.tag == 'value':
 			stmts.append(build_if(node, nodes.pop()))
@@ -156,9 +156,7 @@ def main():
 	js_code = parse_xml(root)	
 	print(js_code)	
 
-if __name__ == "__main__":
-	main()
-
-
 block_type = {"procedures_defreturn": write_fn, "procedures_defnoreturn": write_no_return_fn, "controls_if": write_controls, "text_print": make_print_stmt, "math_arithmetic": write_math, "logic_compare": write_math, "math_number": get_value, "variables_get": get_value, 'text': get_value} 
 
+if __name__ == "__main__":
+	main()

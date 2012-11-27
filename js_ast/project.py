@@ -22,8 +22,6 @@ python flask, jinja2
 
 basics of str - indexing str/ 
 array - indexing 
-Function calls
-conditional statements-- if/ else
 loops - for loop / while loop / 
 
  
