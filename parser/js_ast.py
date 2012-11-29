@@ -1,4 +1,3 @@
-from operators import basic
 tab, tab2 = "    ", "        "
 
 """
@@ -144,7 +143,7 @@ class MathExpr(object):
 		self.left_operand = left_operand
 		self.right_operand = right_operand
 	def __str__(self):	
-		return str(self.left_operand) + basic[self.operator] + str(self.right_operand)
+		return str(self.left_operand) + str(self.operator) + str(self.right_operand)
 
 # use decorators to add wrapper to expr? 
 class PrintStmt(Stmt):

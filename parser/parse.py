@@ -5,8 +5,6 @@ op = [] # may not be necssary
 # keywords: cond, define, abs
 
 #(if <predicate> <consequent> <alternative>)
-# cond stands for conditional
-# (<p> <e>) are clauses
 # <p> is a predicate
 # <e> consequent expr
 
@@ -41,15 +39,13 @@ def write_controls(block):
         elif node.tag == 'statement': 
             stmts.append(build_else(node)) 
     return build_control(stmts) 
+
 """
 
 special_form = {}
+
 def tokenize(s):
 	return s.replace('(', ' ( ').replace(')', ' ) ').split()
-
-def read(s):
-	return read_from(tokenize(s), 0)
-
 # converts any function in Scheme to equivalent string expr in JS
 
 # (else <Stmt>) --> else { return <Stmt>; } 
@@ -86,11 +82,14 @@ def predicate(expr):
 	else:
 		read_from(expr, 1)	
 	return MathExpr(expr[0], 
+
 # send predicate to read_from 
 # send expr to read_from
 def construct_cond(tokens, pos):
 	pass
 	# must construct
+
+# (if <pred> <consq> <alt>)
 def construct_if(tokens, pos):
 	pass	
 
@@ -150,7 +149,11 @@ Norvig Style:"Numbers become numbers. Every other token is a symbol."
         try: return float(token) 
         except ValueError: 
             return Symbol(token)
-"""	
+"""
+	
+def read(s):
+	return read_from(tokenize(s), 0)
+
 def parse(s):
 	print read(tokenize(s))
 
