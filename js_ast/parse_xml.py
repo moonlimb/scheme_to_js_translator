@@ -91,9 +91,6 @@ def make_print_stmt(block):
 		expr = process_block_internal(get_only_child(children))
 		return PrintStmt(expr)
 
-def write_else():
-	pass
-
 def process_stmt(stmt_block):
 	block = stmt_block.get_only_child()	
 	pass
@@ -113,11 +110,20 @@ def process_block(node):
 def process_controls(parent_block):
 	return process_block(get_only_child(parent_block))
 
+def loop_for_each():
+	pass
+
+def loop_for():
+	pass
+
+def loop_while():
+	pass
+
+
 def build_control(stmts):
 	condition = stmts[0][0]
 	body = stmts[0][1]	
 	elses = stmts[1:] if len(stmts)>1 else [""]
-#	print condition, body, elses
 	return IfStmt(condition, body, elses)
 
 # reverse() is O(n)
@@ -138,9 +144,6 @@ def parse_xml(root):
 	processed_blocks = [process_block(b) for b in blocks]	#map(process_block, blocks)
 	return JsAST(processed_blocks)
 
-# return tag_to_function.get(root.tag)(child)
-# tag_to_function = {'xml': parse_xml, 'block': process_block}
-
 def make_js_file():
 	pass	
 	# xml_file = raw_input('xml_filename >> ')
@@ -156,7 +159,7 @@ def main():
 	js_code = parse_xml(root)	
 	print(js_code)	
 
-block_type = {"procedures_defreturn": write_fn, "procedures_defnoreturn": write_no_return_fn, "controls_if": write_controls, "text_print": make_print_stmt, "math_arithmetic": write_math, "logic_compare": write_math, "math_number": get_value, "variables_get": get_value, 'text': get_value} 
+block_type = {"procedures_defreturn": write_fn, "procedures_defnoreturn": write_no_return_fn, "controls_if": write_controls, "text_print": make_print_stmt, "math_arithmetic": write_math, "logic_compare": write_math, "math_number": get_value, "variables_get": get_value, 'text': get_value, "controls_forEach": loop_for_each, "controls_for": loop_for, "controls_whileUntil": loop_while}
 
 if __name__ == "__main__":
 	main()
