@@ -35,11 +35,17 @@ class Stmt(object):
 	def __init__(self, stmt):
 		self.stmt = stmt
 	def __str__(self):
-		return "%s" %str(self.stmt)
+		if isinstance(self.stmt, list):
+			stmt = ' '.join(self.stmt).replace('( ', '(').replace(' )',')')
+			return '%s' %stmt
+		else:	# isinstance(self.stmt, str)
+			return "%s" %str(self.stmt)
 
 class ValueExpr(Expr):
 	def __init__(self, value):
 		self.value = value
+	def __str__(self):
+		return '%f' %float(self.value)
 
 class VarExpr(Expr):
 	def __init__(self, name):
@@ -136,7 +142,7 @@ class FunctionDef(object):
 		param = ', '.join(self.args)
 		return "function %s(%s) {\n%s \n}" %(str(self.name), param, str(self.stmt))
 
-class MathExpr(object):
+class ArithmeticExpr(object):
 	# operand could be variables or expressions
 	def __init__(self, operator, left_operand, right_operand):
 		self.operator = operator

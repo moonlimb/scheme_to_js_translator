@@ -1,14 +1,15 @@
-op = [] # may not be necssary
-# WED, 28 NOV
-# Objective: Parse 'cond' and 'if' expressions in Scheme to JS
+op = ['+','-','<','>','>=','<=','eq?', 'equal?']
+logic = ['and', 'or', 'not'] # are there more in Scheme?
+
+# what is the difference b/w op.is_ and op.eq?
+	# eq? : op.is_
+	# equal?: op.eq
 
 # keywords: cond, define, abs
 
 #(if <predicate> <consequent> <alternative>)
 # <p> is a predicate
 # <e> consequent expr
-
-#and or not
 
 """
 <note>		'() empty list --> don't split these
@@ -54,35 +55,40 @@ def tokenize(s):
 		#	  else { return alt_stmt ;}
 
 def read_from(tokens, pos):
+	print tokens, pos
 	token = tokens[pos]		# token is a current token
 	if len(tokens) == 0:
-		return "EOF"	# norvig raises an EOF error here 
+		raise "unexpected EOF while reading"	# copied from Norvig	
+		# EOF = end of file
 	if token == '(':
-		L=[]	
+		L=[]
+		print "printing L:%r and token:%r" %(L, token)
 		while tokens[pos] != ')':
-			pos += 1
-			L.append(read_from(tokens, pos))
-		pos += 1	# move past )
-		return L	
+			print "hello"
+			(ls, pos)= read_from(tokens, pos+1)
+			L.append(ls)
+			return L
+		print L, pos+1		# pos skips that of )
 	elif token == ')':
-		pass # raise error
+		raise SyntaxError("unexpected \) while reading")	# copied from Norvig
 	elif special_form.get(token):	# token is a special form
-		return special_form[token](tokens, pos)
+		return special_form[token](tokens, pos), pos
+	elif token in op:
+		print "current_token: %s" %token
+		l_op, current_pos = read_from(tokens, pos+1)
+		predicate()	
+		print "current_token: %s" %l_op
+		#r_op, pos = atom(tokens[pos], current_pos+1)	
+	# l_op and r_op may be a list or a str
 	else:	# token is an atom
-		return atom(token[pos])
-
-def write_math():
-	pass
-
-# predicate is any expr that evaluates top #f or #t
-def predicate(expr):
-	op = expr[0]
-	if len(expr) == 3:
-		return MathExpr(op, expr[1], expr[2])
-	else:
-		read_from(expr, 1)	
-	return MathExpr(expr[0], 
-
+		print "i am an atom: %r" %(token)
+		return atom(token), pos+1
+"""
+		#return atom(tokens[pos]), pos+1
+l_op, pos= read_from(tokens, pos+1)
+		r_op, pos= read_from(tokens, pos)
+		print l_op, r_op
+		print predicate(token, l_op, r_op), pos"""
 # send predicate to read_from 
 # send expr to read_from
 def construct_cond(tokens, pos):
@@ -98,12 +104,24 @@ def construct_else():
 
 # (if (<pred>) (<body>) else_stmt))
 
-def construct_if_else():
-	pass
+# y if x else z
+# (if x y z)
+# predicate is any expr that evaluates top #f or #t
+def predicate(op, l_op, r_op):
+	pass	
+
+def construct_if_else(tokens, pos):
+#	l_op, pos = read_from(tokens, pos+1)
+#	r_op, pos = read_from(tokens, pos)
+	op = tokens[0]
+	l_op = Stmt(l_op) if isinstance(l_op, list) else atom(l_op)
+	r_op = Stmt(r_op) if isinstance(r_op, list) else atom(r_op)
+	return MathExpr(op, l_op, r_op)
+
+
 # updates pos by 1 and returns the new corresponding token
 def get_next_token(tokens, pos):
-	new_pos = pos + 1
-	return tokens[new_pos], new_pos
+	return tokens[pos+1], pos+1	# pos+1 is the new_pos
 	
 # cond ((predicate) expr)
 #	predicate) expr
@@ -122,9 +140,7 @@ def write_cond(tokens, pos):
 	while token != ')':
 		do_stmt.append(token)
 		token, pos = get_next_token(tokens, pos)
-	construct_if(pred, do_stmt)		
-	
-return construct_if(pred, do_expr) 
+	return construct_if(pred, do_stmt) 
 
 #iterative: build_cond(tokens, pos)
 
@@ -137,9 +153,8 @@ def write_fn(tokens, pos):
 		
 # int or string
 def atom(token):
-	token = tokens[pos]
 	if isinstance(token, int) or isinstance(token, float):
-		return float(token):
+		return float(token)
 	if isinstance(token, str): 	#str is a Symbol
 		return token
 """
@@ -151,10 +166,14 @@ Norvig Style:"Numbers become numbers. Every other token is a symbol."
             return Symbol(token)
 """
 	
-def read(s):
-	return read_from(tokenize(s), 0)
+def read(tokens):
+	return read_from(tokens, 0)
 
 def parse(s):
-	print read(tokenize(s))
+	tokens = tokenize(s)
+	print tokens, len(tokens)
+	js_code, final_pos = read(tokens)
+	assert final_pos == len(tokens)-1		 
+	print final_pos
 
 special_form = {'define': write_fn, 'cond': write_cond, 'else': construct_else, 'if': construct_if_else}
