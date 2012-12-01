@@ -1,3 +1,6 @@
+from sys import argv
+from js_ast import JsAST, Stmt, ReturnStmt, PrintStmt, IfStmt, ElseIfStmt, ElseStmt, Expr, ValueExpr, VarExpr, ArithExpr
+
 op = ['+','-','<','>','>=','<=','eq?', 'equal?']
 logic = ['and', 'or', 'not'] # are there more in Scheme?
 
@@ -42,11 +45,8 @@ def write_controls(block):
     return build_control(stmts) 
 
 """
-
 special_form = {}
 
-def tokenize(s):
-	return s.replace('(', ' ( ').replace(')', ' ) ').split()
 # converts any function in Scheme to equivalent string expr in JS
 
 # (else <Stmt>) --> else { return <Stmt>; } 
@@ -64,7 +64,6 @@ def read_from(tokens, pos):
 		L=[]
 		print "printing L:%r and token:%r" %(L, token)
 		while tokens[pos] != ')':
-			print "hello"
 			(ls, pos)= read_from(tokens, pos+1)
 			L.append(ls)
 			return L
@@ -76,7 +75,6 @@ def read_from(tokens, pos):
 	elif token in op:
 		print "current_token: %s" %token
 		l_op, current_pos = read_from(tokens, pos+1)
-		predicate()	
 		print "current_token: %s" %l_op
 		#r_op, pos = atom(tokens[pos], current_pos+1)	
 	# l_op and r_op may be a list or a str
@@ -108,16 +106,17 @@ def construct_else():
 # (if x y z)
 # predicate is any expr that evaluates top #f or #t
 def predicate(op, l_op, r_op):
-	pass	
+	return ArithExpr(op, l_op, r_op)
 
 def construct_if_else(tokens, pos):
-#	l_op, pos = read_from(tokens, pos+1)
-#	r_op, pos = read_from(tokens, pos)
+	pass
+	"""l_op, pos = read_from(tokens, pos+1)
+	r_op, pos = read_from(tokens, pos)
 	op = tokens[0]
 	l_op = Stmt(l_op) if isinstance(l_op, list) else atom(l_op)
 	r_op = Stmt(r_op) if isinstance(r_op, list) else atom(r_op)
 	return MathExpr(op, l_op, r_op)
-
+"""
 
 # updates pos by 1 and returns the new corresponding token
 def get_next_token(tokens, pos):
@@ -153,27 +152,60 @@ def write_fn(tokens, pos):
 		
 # int or string
 def atom(token):
-	if isinstance(token, int) or isinstance(token, float):
-		return float(token)
-	if isinstance(token, str): 	#str is a Symbol
-		return token
-"""
-Norvig Style:"Numbers become numbers. Every other token is a symbol." 
-    try: return int(token) 
-    except ValueError: 
-        try: return float(token) 
-        except ValueError: 
-            return Symbol(token)
-"""
-	
+	# Norvig Style: "Numbers become numbers. Every other token is a symbol." 
+	Symbol = str
+	try: return float(token)
+	except ValueError:
+		return Symbol(token)	#token is a Symbol
+
+
+# return tokens with ( replaced by [ and ) by ]		
+# base case: reached ) --> close the list and return to outer list
+def read_from(tokens, i):
+	if len(tokens) == 0:	 # EOF = end of file
+		raise "unexpected EOF while reading"	# EOF = end of file
+	token = tokens[i]
+	print "current token is %s" %token
+	if token == '(':
+		print "detected ("
+		L = []	# create a list	
+		while tokens[i] != ')':
+			(ls, i) = read_from(tokens, i+1)
+			L.append(ls)
+		return L, i+1
+	elif token == ')':	# i skips pos of )
+		raise SyntaxError("unexpected ) while reading")	
+	else:	# token is an atom
+		print "i am an atom: %r" %(token)
+		return atom(token), i+1
+			 
 def read(tokens):
 	return read_from(tokens, 0)
 
+def tokenize(s):
+	return s.replace('(', ' ( ').replace(')', ' ) ').split()
+
 def parse(s):
 	tokens = tokenize(s)
-	print tokens, len(tokens)
+	print tokens
+	return read(tokens)
+"""
 	js_code, final_pos = read(tokens)
 	assert final_pos == len(tokens)-1		 
-	print final_pos
+"""
 
 special_form = {'define': write_fn, 'cond': write_cond, 'else': construct_else, 'if': construct_if_else}
+
+def read_file(file):
+	f = open(file)
+	f_str = f.read()
+	f.close()
+	return f_str
+
+def main():
+	script, file_name = argv
+	f = read_file(file_name)
+	print parse(f)
+
+if __name__ == '__main__':
+	main()	

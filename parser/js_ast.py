@@ -142,7 +142,7 @@ class FunctionDef(object):
 		param = ', '.join(self.args)
 		return "function %s(%s) {\n%s \n}" %(str(self.name), param, str(self.stmt))
 
-class ArithmeticExpr(object):
+class ArithExpr(object):
 	# operand could be variables or expressions
 	def __init__(self, operator, left_operand, right_operand):
 		self.operator = operator
