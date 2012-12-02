@@ -84,7 +84,7 @@ class ElseStmt(Stmt):
 	def __str__(self):
 		return "else {\n    %s \n};" %(str(self.stmt))
 
-class SimpleIf(object):
+class SimpleIfStmt(object):
 	def __init__(self, pred, body):
 		self.pred = pred	# pred is predicate (evaluates to a boolean literal)
 		self.body = body	# body is consequential expression corresponding to a predicate 
@@ -95,7 +95,7 @@ class IfStmt(object):
 	def __init__(self, cond, body, elses):
 		self.cond = cond	# cond is expression
 		self.body = body	# body is if statement's body 
-		self.elses = elses 	#list of elseif and else stmts	
+		self.elses = elses 	# list of elseif and else stmts	
 	def __str__(self):
 		if self.elses:
 			return "if (%s) {\n%s%s\n}; %s" %(str(self.cond), tab, str(self.body),' '.join([str(else_if) for else_if in self.elses]))

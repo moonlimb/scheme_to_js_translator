@@ -53,40 +53,8 @@ special_form = {}
 # (if (<pred>) (<do_stmt>) alt_stmt)) 
 		# --> if (<pred>){return <do_stmt>;} 
 		#	  else { return alt_stmt ;}
-
-def read_from(tokens, pos):
-	print tokens, pos
-	token = tokens[pos]		# token is a current token
-	if len(tokens) == 0:
-		raise "unexpected EOF while reading"	# copied from Norvig	
-		# EOF = end of file
-	if token == '(':
-		L=[]
-		print "printing L:%r and token:%r" %(L, token)
-		while tokens[pos] != ')':
-			(ls, pos)= read_from(tokens, pos+1)
-			L.append(ls)
-			return L
-		print L, pos+1		# pos skips that of )
-	elif token == ')':
-		raise SyntaxError("unexpected \) while reading")	# copied from Norvig
-	elif special_form.get(token):	# token is a special form
-		return special_form[token](tokens, pos), pos
-	elif token in op:
-		print "current_token: %s" %token
-		l_op, current_pos = read_from(tokens, pos+1)
-		print "current_token: %s" %l_op
-		#r_op, pos = atom(tokens[pos], current_pos+1)	
-	# l_op and r_op may be a list or a str
-	else:	# token is an atom
-		print "i am an atom: %r" %(token)
-		return atom(token), pos+1
-"""
 		#return atom(tokens[pos]), pos+1
-l_op, pos= read_from(tokens, pos+1)
-		r_op, pos= read_from(tokens, pos)
-		print l_op, r_op
-		print predicate(token, l_op, r_op), pos"""
+
 # send predicate to read_from 
 # send expr to read_from
 def construct_cond(tokens, pos):
@@ -149,45 +117,71 @@ def write_fn(tokens, pos):
 	# name, args (list), stmt
 	# (define (<name> <params>)
 		# <stmt>)	
-		
+
+def write_js_from(AST):
+	# define --> function{}
+		# name, args, stmts
+		# name = abs
+		# args x
+		# stmts
+		# if ( x < 0):
+		# 	return -x
+		# else:
+		# 	return x
+	# abs --> ValueExpr
+	#  x--> VarExpr
+	# if --> IfStmt / ElseStmt
+	# CondStmts 
+	node = AST[0] 
+	if len(AST) == 0:
+		print "unexpected end of code while reading"
+    elif  
+        L = [] 
+        while tokens[0] != ')': 
+            L.append(read_from(tokens)) 
+        tokens.pop(0)   # pop off ')' 
+        return L 
+    elif ')' == token: 
+        raise SyntaxError('unexpected ) while reading') 
+    else: 
+        return atom(token) 
+	
+def write_js(AST):
+	#js_code = write_js_from(AST)	
+	js_code = "Scheme to JS translations success!"
+	return js_code
+
 # int or string
 def atom(token):
 	# Norvig Style: "Numbers become numbers. Every other token is a symbol." 
 	Symbol = str
-	try: return float(token)
+	try:	return float(token)
 	except ValueError:
 		return Symbol(token)	#token is a Symbol
 
-
 # return tokens with ( replaced by [ and ) by ]		
 # base case: reached ) --> close the list and return to outer list
-def read_from(tokens, i):
-	if len(tokens) == 0:	 # EOF = end of file
-		raise "unexpected EOF while reading"	# EOF = end of file
-	token = tokens[i]
-	print "current token is %s" %token
-	if token == '(':
-		print "detected ("
-		L = []	# create a list	
-		while tokens[i] != ')':
-			(ls, i) = read_from(tokens, i+1)
-			L.append(ls)
-		return L, i+1
-	elif token == ')':	# i skips pos of )
-		raise SyntaxError("unexpected ) while reading")	
-	else:	# token is an atom
-		print "i am an atom: %r" %(token)
-		return atom(token), i+1
-			 
+def read_from(tokens):
+    if len(tokens) == 0: 
+        raise SyntaxError('unexpected EOF while reading') # EOF = end of file token = tokens.pop(0) if '(' == token: 
+        L = [] 
+        while tokens[0] != ')': 
+            L.append(read_from(tokens)) 
+        tokens.pop(0)   # pop off ')' 
+        return L 
+    elif ')' == token: 
+        raise SyntaxError('unexpected ) while reading') 
+    else: 
+        return atom(token) 
+		 
 def read(tokens):
-	return read_from(tokens, 0)
+	return read_from(tokens)
 
 def tokenize(s):
 	return s.replace('(', ' ( ').replace(')', ' ) ').split()
 
 def parse(s):
 	tokens = tokenize(s)
-	print tokens
 	return read(tokens)
 """
 	js_code, final_pos = read(tokens)
@@ -205,7 +199,8 @@ def read_file(file):
 def main():
 	script, file_name = argv
 	f = read_file(file_name)
-	print parse(f)
+	AST = parse(f)
+	print write_js_from(AST)
 
 if __name__ == '__main__':
 	main()	

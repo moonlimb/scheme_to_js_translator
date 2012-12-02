@@ -2,7 +2,7 @@
 import xml.etree.ElementTree as ET
 from sys import argv
 import re
-from js_ast import JsAST, FunctionDef, Expression, Statement, PrintStmt, ReturnStmt, MathExpr, IfStmt, ElseStmt, ElseIfStmt
+from js_ast import JsAST, FunctionDef, Expr, Stmt, PrintStmt, ReturnStmt, MathExpr, IfStmt, ElseStmt, ElseIfStmt
 import logging
 #from decorate import add_curly_braces
 

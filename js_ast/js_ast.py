@@ -128,7 +128,7 @@ class FunctionDef(object):
 		self.stmt = stmt
 	def __str__(self):
 		param = ', '.join(self.args)
-		return "function %s(%s) {\n%s \n}" %(str(self.name), param, str(self.stmt))
+		return "function %s(%s) {\n%s%s \n}" %(str(self.name), param, tab, str(self.stmt))
 
 class MathExpr(object):
 	# operand could be variables or expressions

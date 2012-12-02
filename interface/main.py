@@ -5,10 +5,15 @@ app = Flask(__name__)
 SECRET_KEY = "You are my compiler. My life wouldn't start without you."
 app.config.from_object(__name__)
 
-
-@app.route("/")
+@app.route('/')
 def index():
-	return "this is index page"
+	return render_template('scheme.html') 
+
+@app.route('/scheme', methods=['GET','POST'])
+def input_scheme():
+	code = request.form['scheme_code']	 
+	js_code = code#"translated scheme_code to js_code"
+	return render_template("js.html", js_code = js_code)
 
 if __name__== "__main__":
 	app.run(debug=True)

@@ -1,0 +1,27 @@
+<!-- DOCTYPE html>
+<!-- layout template -->
+
+<html>
+    <head>
+        <title>Scheme to JavaScript Language Translator</title>
+        <link rel="stylesheet" href="/static/tensor.css" type="text/css">
+    </head>
+
+    <body>
+		{% with messages = get_flashed_messages() %}
+        	{% if messages %}
+            	<ul class=flashes>
+                	{% for message in messages %}
+                   		{{ message }}
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+		<div class='container'>
+			{% block body %}
+			{% endblock %}
+		</div>
+	</body>
+</html>
+
+
