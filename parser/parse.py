@@ -27,24 +27,6 @@ string literal: "hello()"
 # boolean variables to keep in track: is_string is_list	
 # redefine a split function 		
 
-""" condition = stmts[0][0] 
-    body = stmts[0][1]   
-    elses = stmts[1:] if len(stmts)>1 else [""] 
-    return IfStmt(condition, body, elses) 
-
-def write_controls(block): 
-   nodes = get_children(block) 
-    nodes.reverse()  
-    stmts=[] 
-    while len(nodes) > 0: 
-        node = nodes.pop() 
-        if node.tag == 'value': 
-            stmts.append(build_if(node, nodes.pop())) 
-        elif node.tag == 'statement': 
-            stmts.append(build_else(node)) 
-    return build_control(stmts) 
-
-"""
 special_form = {}
 
 # converts any function in Scheme to equivalent string expr in JS
@@ -59,7 +41,6 @@ special_form = {}
 # send expr to read_from
 def construct_cond(tokens, pos):
 	pass
-	# must construct
 
 # (if <pred> <consq> <alt>)
 def construct_if(tokens, pos):
@@ -92,26 +73,29 @@ def get_next_token(tokens, pos):
 	
 # cond ((predicate) expr)
 #	predicate) expr
+"""
 def get_expr(tokens, pos):
 	expr = []
 	while token != ')':		# 	append predicate to pred 
 		expr.append(token)
 		token, pos = get_next_token(tokens, pos)
-	return expr, pos+1
-
+	return expr
+"""
 # all () after cond is if_do pair
-def write_cond(tokens, pos):
+def write_cond(tokens):
+	pass
+"""
 	token = tokens[pos+2]	# token --> predicate 
-	pred, pos = get_expr(tokens, pos)
+	pred = get_expr(tokens)
 	do_stmt = read_from(get_expr(tokens))
 	while token != ')':
 		do_stmt.append(token)
-		token, pos = get_next_token(tokens, pos)
+		token = get_next_token(tokens)
 	return construct_if(pred, do_stmt) 
-
+"""
 #iterative: build_cond(tokens, pos)
 
-def write_fn(tokens, pos):
+def write_fn(tokens):
 	pass
 	# call get_expr function	
 	# name, args (list), stmt
@@ -119,6 +103,9 @@ def write_fn(tokens, pos):
 		# <stmt>)	
 
 def write_js_from(AST):
+	node = AST.pop()
+	pass
+
 	# define --> function{}
 		# name, args, stmts
 		# name = abs
@@ -131,11 +118,13 @@ def write_js_from(AST):
 	# abs --> ValueExpr
 	#  x--> VarExpr
 	# if --> IfStmt / ElseStmt
-	# CondStmts 
+	# CondStmts
+
+""" 
 	node = AST[0] 
 	if len(AST) == 0:
 		print "unexpected end of code while reading"
-    elif  
+    elif '(' == node:
         L = [] 
         while tokens[0] != ')': 
             L.append(read_from(tokens)) 
@@ -145,13 +134,14 @@ def write_js_from(AST):
         raise SyntaxError('unexpected ) while reading') 
     else: 
         return atom(token) 
-	
+"""	
+
 def write_js(AST):
 	#js_code = write_js_from(AST)	
-	js_code = "Scheme to JS translations success!"
+	js_code = "Scheme to JS translation success!"
 	return js_code
 
-# int or string
+# atom integer / letters/ combination of both and special char / ()
 def atom(token):
 	# Norvig Style: "Numbers become numbers. Every other token is a symbol." 
 	Symbol = str
@@ -162,32 +152,40 @@ def atom(token):
 # return tokens with ( replaced by [ and ) by ]		
 # base case: reached ) --> close the list and return to outer list
 def read_from(tokens):
-    if len(tokens) == 0: 
-        raise SyntaxError('unexpected EOF while reading') # EOF = end of file token = tokens.pop(0) if '(' == token: 
-        L = [] 
-        while tokens[0] != ')': 
-            L.append(read_from(tokens)) 
-        tokens.pop(0)   # pop off ')' 
-        return L 
-    elif ')' == token: 
-        raise SyntaxError('unexpected ) while reading') 
-    else: 
-        return atom(token) 
-		 
+	pass
+"""
+	if len(tokens) == 0: 
+		raise SyntaxError('unexpected EOF while reading') # EOF = end of file
+token = tokens.pop() 
+if '(' == token: 
+L = [] 
+while tokens[-1] != ')': 
+	L.append(read_from(tokens)) 
+tokens.pop()   # pop off ')' 
+return L 
+elif ')' == token: 
+raise SyntaxError('unexpected ) while reading') 
+else: 
+return atom(token) 
+"""		 
 def read(tokens):
+	# create a nested list structure from a list of tokens
 	return read_from(tokens)
 
 def tokenize(s):
+	# convert a string into a list of tokens
 	return s.replace('(', ' ( ').replace(')', ' ) ').split()
 
 def parse(s):
 	tokens = tokenize(s)
+	tokens.reverse()
+	# reverse tokens to pop from the end 
 	return read(tokens)
-"""
-	js_code, final_pos = read(tokens)
-	assert final_pos == len(tokens)-1		 
-"""
+	
+# reverse a list O(n)
+# pop()	O(1) vs. pop(n) O(n)
 
+# dictionary that maps from special_forms in Scheme to functions that will construct JS equivalents
 special_form = {'define': write_fn, 'cond': write_cond, 'else': construct_else, 'if': construct_if_else}
 
 def read_file(file):
@@ -200,7 +198,7 @@ def main():
 	script, file_name = argv
 	f = read_file(file_name)
 	AST = parse(f)
-	print write_js_from(AST)
+	print write_js(AST)
 
 if __name__ == '__main__':
 	main()	

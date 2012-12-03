@@ -1,0 +1,58 @@
+Motivations:
+
+powr of lisp  simple syntax, representation of programs as data objects
+LISP = list processing
+new data objects: atoms and lists
+- in Lisp, procedures are also represented and manipulated as Lisp data
+- fundamental unit of lisp is atom
+- numbers are atoms
+	- numeric atom: int / floats
+	- non-numeric atom: any name made of letters, numbers (1st letter is a letter
+		alphanumeric atom --> may contain special chars suh s * and +
+	- Nil () is an atom
+		- 
+Understand how programming languages work 
+	- ended up doing only translations not executions
+
+Compiler -> transforms source written in one language to a target code in another language;
+
+Challenges:
+	- wrapping my head around recursion: 
+	- abstraction / functional programming / defining dictionary at top and adding at the bottom
+	- designing programs (small scale/ large scale)
+	- appreciate the beauty of recursion: breaking a large problem into small known, solvable
+problem/ base case
+
+induction / 
+	- 
+	understand programming languages what 
+	
+AST  = tree representation of the abstract syntactic structure of source code written in a programming langauge
+
+o
+- 
+
+i
+
+Lessons Learnt:
+
+usually high to low level language
+often to execute the target code
+
+Language translator / converter: b/w high-level languages
+
+source code--(lexical analysis)-> tokens --(parsing)--> AST --(semantic analysis)
+
+What is an abstract syntax tree?
+S-expression
+atom
+
+
+Compiler
+- lexical analysis
+- preprocessing
+- parsing
+- semantic analysis
+- code generation
+- code optimization
+
