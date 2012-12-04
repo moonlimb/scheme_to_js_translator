@@ -1,35 +1,57 @@
+;; returns a random number between 1 and n
 
-(define (compare-nums user-guess rand-num)
-	(if (> user-guess rand-num) 
-		(display "your guess is too high, try again.")
-		(display "your guess is too low, try again.")))
+(random n) --> returns a random number b/w 0 and n
+(+ 1 (random n)) --> returns a random number b/w 1 and n
+(+ b (random n)) --> Math.floor(Math.random() * n) + b
 
-(define (get-user-guess)
+;; compares guess with num
+(define (compare-nums guess num)
+	(if (> guess num) 
+		("too high")
+		"too low"))
+
+;; returns a random number between 1 and n
+(define (generate-rand-num n)
+	(+ 1 (random n)))
+
+;; get user input
+(define (get-user-input)
+	(88))
+
+(define (get-new-guess n)
 	()
-# user input converted from string to int 
-def get_user_guess(count): 
-    # increment user guess count by 1 
-    return int(raw_input("Type your guess: ")), count+1 
+)
+
+;; guess > num
+;; num > guess
+
+(define (make-new-guess low-bound high-bound prev-guess)
+	(if ((eq? prev-guess 'too high')
+		(let high-bound (- prev-guess 1))		
+		(let low-bound (+ prev-guess 1))))
+
+(define (make-guess guess num)
+	(cond (= guess num)
+			()
+			())
+
+;; plays number guessing game with a random number generated b/w 1-n
+(define (play-guess-game n)) 
+	(let guess (get-user-input)
+	(let num (generate-rand-num n) 
+		(j
+    while (human_input != perfect): 
+        elif human_input == too_high: 
+            high_bound = CS_guess - 1 
+            print low_bound, high_bound 
+        else: #human_input == too_low:  
+            low_bound= CS_guess+1 
+            print low_bound, high_bound  
+        CS_guess = (low_bound + high_bound)/2 
+        count+=1 
+        print count 
+        print "This is my new guess: %d." %CS_guess
  
-def generate_rand_num(): 
-    "produce random # betwen 1-100" 
-    return random.randint(1,100) 
- 
-def make_guesses(rand_num): 
-    user_num, count = get_user_guess(0) 
-    while (user_num != rand_num): 
-        compare_nums(user_num, rand_num) 
-        user_num, count = get_user_guess(count) 
-    return count 
- 
-def main(): 
-    user_name = raw_input("what is your name? ") 
-    rand_num = generate_rand_num()   
-    print "%s, i'm thinking of a number between 1 and 100. Try to guess my number." %user_name 
- 
-    # count is number of user guesses 
-    count = make_guesses(rand_num)   
- 
-    # congratulatory message 
-    print "well done, %s! you found my number in %d tries!" %(user_name, count) 
+(define (get-user-guess count)
+	()
 

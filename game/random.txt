@@ -8,4 +8,9 @@ ex. (random 3)	ireturns a random number b/w 0 and 2 (b/w - and n-1)
   (let ((range (- high low)))
     (+ low (random range))))
 
-
+# let in Scheme is assignment
+(let ((<var1> <exp1>)
+      (<var2> <exp2>)
+      
+      (<varn> <expn>))
+   <body>)

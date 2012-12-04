@@ -1,0 +1,15 @@
+
+# operations: + - / *
+
+
+# 
+
+# eq? compares two strings
+# (eq? a b)
+# if a or b is a VarExpr, get string corresponding to VarExpr
+
+
+# let --> assignment
+(let ((<var> <expr>)
+	  (<var> <expr>))
+		<body>)

@@ -19,15 +19,18 @@ class JsAST(object):
 	def __init__(self, code):
 		self.code = code
 	def __str__(self):
-		str_code = [str(chunk) for chunk in self.code]
-		return '\n'.join(str_code)
+		if len(self.code)==1:
+			return str(self.code)	
+		else:
+			str_code = [str(chunk) for chunk in self.code]
+			return '\n'.join(str_code)
 
 # Expression is a combination of values, variables, operators, and function calls
 class Expr(object):
 	def __init__(self, expr):
 		self.expr = expr 
 	def __str__(self):
-		return '%s' %self.expr
+		return '%s' %str(self.expr)
 
 # ex. if (stmt)
 # Statement is an instruction Python interpreter can execute
@@ -53,7 +56,7 @@ class VarExpr(Expr):
 	def __str__(self):
 		return '%s' %str(self.name)
 """
-class DeclarationStmt(Stmt):
+tlass DeclarationStmt(Stmt):
 	def __init__(self, var_expr): 
 		self.var_expr = var_expr
 	def __str__(self):
@@ -133,7 +136,7 @@ class WhileLoop(object):
 	def __str__(self):
 		return "while (%s) {\n%s%s\n}" %(str(self.cond), tab, str(self.body))
 
-class FunctionDef(object):
+class Function(object):
 	def __init__(self, name, args, stmt):
 		self.name = name
 		self.args = args	#args is a list
