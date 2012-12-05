@@ -44,25 +44,31 @@ class Stmt(object):
 		else:	# isinstance(self.stmt, str)
 			return "%s" %str(self.stmt)
 
+class Operator(Expr):
+	def __init__(self, symbol):
+		self.symbol = symbol
+	def __str__(self):
+		return "%s" %str(self.symbol)
+
 class ValueExpr(Expr):
 	def __init__(self, value):
 		self.value = value
 	def __str__(self):
-		return '%f' %float(self.value)
+		return '%s' %str(self.value)
 
 class VarExpr(Expr):
 	def __init__(self, name):
 		self.name = name	
 	def __str__(self):
 		return '%s' %str(self.name)
-"""
-tlass DeclarationStmt(Stmt):
+
+class DeclarationStmt(Stmt):
 	def __init__(self, var_expr): 
 		self.var_expr = var_expr
 	def __str__(self):
 		return 'var %s;' %str(self.var_expr)
 
-class AssignmentStmt(Stmt)
+class AssignmentStmt(Stmt):
 	def __init__(self, var_expr, value, is_declaration):
 		self.var_expr = var_expr
 		self.value = value
@@ -73,7 +79,6 @@ class AssignmentStmt(Stmt)
 			return 'var %s' %assignment 
 		else:
 			return assignment
-"""
 
 # should ElseIfStmt inherit from object or Statement?
 class ElseIfStmt(object):
@@ -87,12 +92,13 @@ class ElseStmt(Stmt):
 	def __str__(self):
 		return "else {\n    %s \n};" %(str(self.stmt))
 
-class SimpleIfStmt(object):
-	def __init__(self, pred, body):
+class IfElseStmt(object):
+	def __init__(self, pred, body, else_stmt):
 		self.pred = pred	# pred is predicate (evaluates to a boolean literal)
 		self.body = body	# body is consequential expression corresponding to a predicate 
+		self.else_stmt = else_stmt
 	def __str__(self):
-		return "if (%s) {\n%s\n};" %(str(self.pred), tab, str(self.body))
+		return "if (%s) {\n%s%s\n}; %s" %(str(self.pred), tab, str(self.body), str(self.else_stmt))
 
 class IfStmt(object):
 	def __init__(self, cond, body, elses):
@@ -136,23 +142,35 @@ class WhileLoop(object):
 	def __str__(self):
 		return "while (%s) {\n%s%s\n}" %(str(self.cond), tab, str(self.body))
 
+class RecursiveFnCall(object):
+	def __init__(self, name, args):
+		self.name = name
+		self.args = args
+	def __str__(self):
+	#	if self.args > 1:
+	#		params = ", ".join(self.args)
+		return " %s(%s)" %(str(self.name), str(self.args))
+
 class Function(object):
-	def __init__(self, name, args, stmt):
+	def __init__(self, name, args, body):
 		self.name = name
 		self.args = args	#args is a list
-		self.stmt = stmt
+		self.body = body	#body is a liAt
+		
 	def __str__(self):
 		param = ', '.join(self.args)
-		return "function %s(%s) {\n%s \n}" %(str(self.name), param, str(self.stmt))
+		#body_exprs = ''.join(str(self.body))	# better var name?
+		body_str  = "\n".join([str(item) for item in self.body])
+		return "function %s(%s) {\n%s \n}" %(str(self.name), param, body_str)
 
-class ArithExpr(object):
+class MathExpr(object):
 	# operand could be variables or expressions
 	def __init__(self, operator, left_operand, right_operand):
 		self.operator = operator
 		self.left_operand = left_operand
 		self.right_operand = right_operand
 	def __str__(self):	
-		return str(self.left_operand) + str(self.operator) + str(self.right_operand)
+		return "%s %s %s" %(str(self.left_operand), str(self.operator), str(self.right_operand))
 
 # use decorators to add wrapper to expr? 
 class PrintStmt(Stmt):
