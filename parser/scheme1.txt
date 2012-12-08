@@ -1,3 +1,8 @@
+Wunderlist
+***
+
+"" --> support strings
+
 Things to define:
 
 atom = string of characters/digits/symbols not starting w/ ( or )

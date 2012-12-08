@@ -1,7 +1,8 @@
 from sys import argv
-from js_ast import RecursiveFnCall, JsAST, Stmt, ReturnStmt, PrintStmt, IfStmt, ElseIfStmt, ElseStmt, Expr, ValueExpr, VarExpr, MathExpr, Function, Operator, IfElseStmt
+from js_ast import FunctionCall, JsAST, Stmt, ReturnStmt, PrintStmt, IfStmt, ElseIfStmt, ElseStmt, Expr, ValueExpr, VarExpr, MathExpr, Function, Operator, IfElseStmt
 import re
 #use regular expression to distinguish float /int and strings
+# make dictionary 
 ops = ['+','*','-','=','<','>','>=','<=','eq?', 'equal?']
 
 logic = ['and', 'or', 'not'] # are there more in Scheme?
@@ -38,6 +39,7 @@ special_form = {}
 def construct_cond(tokens):
 	pass
 
+# fix this fnc
 def make_expr(token):
 	expr=''
 	if isinstance(token, list):
@@ -77,31 +79,35 @@ else --> token in the nested_ls is a VarExpr or ValueExpr
 	# elt is an atom (int or Symbol)
 	# determine whether valueExpr, VarExpr or String?
 """
-def make_recursive_fn(elt,nested_ls):
-	return RecursiveFnCall(elt, make_expr(write_js_from(nested_ls)))
-def write_js_from(nested_ls):
-	#print nested_ls	
-	if not nested_ls:
-		assert nested_ls == []
+def make_recursive_fn(elt,s_expr):
+	return FunctionCall(elt, make_expr(write_js_from(s_expr)))
+
+# mutually recursive functions
+# rename parameter name 
+def write_js_from(s_expr):
+    # change order of if stmts / check special forms first
+	#print s_expr	
+	if not s_expr:
+		assert s_expr == []
 		return ""	
-	if isinstance(nested_ls, str):
-		return make_expr(nested_ls)
-	if isinstance(nested_ls, list):
-		elt = nested_ls.pop(0)
+	if isinstance(s_expr, str):
+		return VarExpr(s_expr)
+	if isinstance(s_expr, list):
+		elt = s_expr.pop(0)
 		if elt == FN_NAME:
-			return make_recursive_fn(elt, nested_ls)
-		if elt in ops:
-			operands = nested_ls
+			return make_recursive_fn(elt, s_expr)
+		if elt in ops:#2
+			operands = s_expr
 			if elt == '=':
 				return construct_math('==', operands)
 			return construct_math(elt, operands)
 		try:
-			if special_form.get(elt): 
-				return special_form[elt](nested_ls)
+			if special_form.get(elt): #1
+				return special_form[elt](s_expr)
 		except TypeError:
 			pass				
 		return make_expr(elt)
-	return nested_ls
+	return s_expr
 
 # (if (<pred>) (<body>) else_stmt))
 def construct_if_else(nested_ls):
@@ -132,7 +138,7 @@ def write_fn_def(nested_ls):
 		# <stmt>	
 
 def write_js(nested_lists):
-	js_code=[]
+	#js_code=[]
 	return write_js_from(nested_lists)
 
 # atom integer / letters/ combination of both and special char / ()
@@ -181,6 +187,8 @@ def parse(s):
 
 # dictionary that maps from special_forms in Scheme to functions that will construct JS equivalents
 special_form = {'define': write_fn_def, 'cond': construct_cond, 'if': construct_if_else} 
+# after special form --> operator ---> function call
+# difference b/w functiondef functioncall
 
 def read_file(file):
 	f = open(file)
