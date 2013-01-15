@@ -1,8 +1,0 @@
-
-p, pos = read_from(tokens, pos+1) 
-    r_op, pos = read_from(tokens, pos) 
-    op = tokens[0] 
-    l_op = Stmt(l_op) if isinstance(l_op, list) else atom(l_op) 
-    r_op = Stmt(r_op) if isinstance(r_op, list) else atom(r_op) 
-    return MathExpr(op, l_op, r_op) 
-
