@@ -9,20 +9,31 @@ atom = string of characters/digits/symbols not starting w/ ( or )
 lat = list of atoms
 n = number
 
-S-expr = 
+What is a S-expr? 
 (zero? n)
 null? lat
 atom?
 
 
-(defin atom?
-	(lambda (x)
-	 and (not (pair? x))
-		  not (null? x)))
-pair?
-
 Keywords: define, lambda, cond, else, and, or quote
-in expressing a function always ask null? first
+
+Rule: in expressing a function always ask null? first
+
+__________special forms____________
+1. lambda expr
+2. lexical binding/ let
+3. dynamic binding / fluid-let
+4. definition / define
+5. assignment / set!
+6. quoting / quote
+7. conditionals/ if cond and or
+8. seqeuncing / begin
+9. iteration / do let
+10. structure defn / define-structure
+11. macros
+12. ...
+
+What is a closure?
 
 1. list operations:
 	list = colelctin of S-expr enclosed by ( and )
@@ -84,4 +95,9 @@ zero? only takes in 1 argument
 	- (eq? 6 7) no ans
 	- (eq? () ()) no ans
 
+(defin atom?
+	(lambda (x)
+	 and (not (pair? x))
+		  not (null? x)))
+pair?
 

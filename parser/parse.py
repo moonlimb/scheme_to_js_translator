@@ -1,15 +1,12 @@
 from sys import argv
-from js_ast import JsAST, Stmt, ReturnStmt, PrintStmt, IfStmt, ElseIfStmt, ElseStmt, Expr, ValueExpr, VarExpr, ArithExpr, Function
+from js_ast import FunctionCall, JsAST, Stmt, ReturnStmt, PrintStmt, IfStmt, ElseIfStmt, ElseStmt, Expr, ValueExpr, VarExpr, MathExpr, Function, Operator, IfElseStmt, FunctionCall
+import re
+#use regular expression to distinguish float /int and strings
+# make dictionary 
+ops = ['+','*','-','=','<','>','>=','<=','eq?', 'equal?']
 
-op = ['+','-','<','>','>=','<=','eq?', 'equal?']
 logic = ['and', 'or', 'not'] # are there more in Scheme?
-
-# what is the difference b/w op.is_ and op.eq?
-	# eq? : op.is_
-	# equal?: op.eq
-
-# keywords: cond, define, abs
-
+FN_NAME='' # *******vim Note: CTRL + O takes to previous position ********* 
 #(if <predicate> <consequent> <alternative>)
 # <p> is a predicate
 # <e> consequent expr
@@ -42,24 +39,35 @@ special_form = {}
 def construct_cond(tokens):
 	pass
 
+# fix this fnc
+def make_expr(token):
+	expr=''
+	if isinstance(token, list):
+		return write_js_from(token)
+	try: return ValueExpr(token)
+	except ValueError: # Variable is a Symbol 
+		return VarExpr(str(token))	
+"""
 # (if <pred> <consq> <alt>)
 def construct_else(stmt):
 	if isinstance(stmt, list):
 		return ElseStmt(write_js_from(stmt))
 	else:
-		try: return ValueExpr(float(token))
-		except ValueError: # Variable is a Symbol 
-			return VariableExpr(str(token))	
+		return make_expr(stmt)
+"""
 
-def negate_var(op, r_op):
-	assert op == '-'
-	return str(op) + str(r_op)
-	
-def construct_math(op, l_op, r_op):
-	if not l_op:
-		return VarExpr(negate_var(op, r_op)) 
-	return ArithExpr(op, l_op, r_op)
+def negate_var(operator, operand):
+	return str(operator) + str(operand)
 
+# op is an operator
+# currently, only supports 1~2 operands
+def construct_math(op, operands):
+	if len(operands) == 1:
+		assert op == '-'
+		return VarExpr(negate_var(op, operands[0]))
+	else:
+		op, l_op, r_op =  [make_expr(op_part) for op_part in [op, operands[0], operands[1]]]
+		return MathExpr(Operator(op), l_op, r_op)
 # y if x else z
 # (if x y z)
 # predicate is any expr that evaluates top #f or #t
@@ -68,36 +76,50 @@ def construct_math(op, l_op, r_op):
 if --> token in the nested_ls is a special form
 elseif --> token in the nested_ls is a list
 else --> token in the nested_ls is a VarExpr or ValueExpr
+	# elt is an atom (int or Symbol)
+	# determine whether valueExpr, VarExpr or String?
 """
+def make_recursive_fn(elt,s_expr):
+	return FunctionCall(elt, make_expr(write_js_from(s_expr)))
 
-def write_js_from(nested_ls):
-	if not nested_ls:
-		assert nested_ls == []
+# mutually recursive functions
+# rename parameter name 
+def write_js_from(s_expr):
+    # change order of if stmts / check special forms first
+	#print s_expr	
+	if not s_expr:
+		assert s_expr == []
 		return ""	
-	elt = nested_ls.pop(0)
-	# print elt
-	#if isinstance(elt, list):
-	#	js_code.append(write_js_from(nested_ls))
-	try:
-		if special_form.get(elt): 
-			return special_form[elt](nested_ls)
-	except TypeError:
-		# elt is an atom (int or Symbol)
-		# determine whether valueExpr, VarExpr or String?
-		return Expr(elt) 
-	return nested_ls
+	if isinstance(s_expr, str):
+		return VarExpr(s_expr)
+	if isinstance(s_expr, list):
+		elt = s_expr.pop(0)
+		if elt == FN_NAME:
+			return make_recursive_fn(elt, s_expr)
+		if elt in ops:#2
+			operands = s_expr
+			if elt == '=':
+				return construct_math('==', operands)
+			return construct_math(elt, operands)
+		try:
+			if special_form.get(elt): #1
+				return special_form[elt](s_expr)
+		except TypeError:
+			pass				
+		return make_expr(elt)
+	return s_expr
 
 # (if (<pred>) (<body>) else_stmt))
 def construct_if_else(nested_ls):
-	print [write_js_from(elt) for elt in nested_ls]
-def construct_if_obj():
+	pred, body, else_stmt= [write_js_from(elt) for elt in nested_ls]
+	#else_stmt may be an expression 
+	return construct_if_obj(pred, body, Expr(write_js_from(else_stmt)))
+
+def construct_if_obj(pred, body, else_stmt):
+	#assert isinstance(pred, MathExpr)
+	return IfElseStmt(pred, Expr(ReturnStmt(body)), ElseStmt(ReturnStmt(else_stmt)))
 	# predicate could also be a nested list
 	# in such case predicate is write_js_from(elt.pop())
-	predicate = construct_math(pred_ls)
-	body = write_js_from(body_ls)
-	else_stmt = construct_else(else_ls)
-#	print  IfStmt(predicate, body, [else_stmt])
-	return IfStmt(predicate, body, [else_stmt])
 
 def write_fn_body(nested_ls, js_code, fn_def):
 	pass
@@ -107,9 +129,8 @@ def write_fn_def(nested_ls):
 	fn_attrib = nested_ls.pop(0)
 	name = fn_attrib[0]	
 	params = fn_attrib[1:]
-	stmt = [write_js_from(elt) for elt in nested_ls]
-	print stmt
-	return Function(name, params, stmt)
+	body = [write_js_from(ls) for ls in nested_ls]	
+	return Function(name, params,body) 
 		
 	# call get_expr function	
 	# name, args (list), stmt
@@ -117,7 +138,7 @@ def write_fn_def(nested_ls):
 		# <stmt>	
 
 def write_js(nested_lists):
-	js_code=[]
+	#js_code=[]
 	return write_js_from(nested_lists)
 
 # atom integer / letters/ combination of both and special char / ()
@@ -125,9 +146,11 @@ def write_js(nested_lists):
 def atom(token):
 	# Norvig Style: "Numbers become numbers. Every other token is a symbol." 
 	Symbol = str
-	try:	return float(token)
+	try:	return int(token)
 	except ValueError:
-		return Symbol(token)	#token is a Symbol
+		try: return float(token)
+		except ValueError:
+			return Symbol(token)	#token is a Symbol
 
 # return tokens with ( replaced by [ and ) by ]		
 # base case: reached ) --> close the list and return to outer list
@@ -141,8 +164,7 @@ def read_from(tokens):
 			L.append(read_from(tokens)) 
 		tokens.pop()   # pop off ')' 
 		return L 
-	elif ')' == token: 
-		raise SyntaxError('unexpected ) while reading') 
+	elif ')' == token: raise SyntaxError('unexpected ) while reading') 
 	else: 
 		return atom(token) 
 
@@ -164,7 +186,9 @@ def parse(s):
 # pop()	O(1) vs. pop(n) O(n)
 
 # dictionary that maps from special_forms in Scheme to functions that will construct JS equivalents
-special_form = {'define': write_fn_def, 'cond': construct_cond, 'else': construct_else, 'if': construct_if_else}
+special_form = {'define': write_fn_def, 'cond': construct_cond, 'if': construct_if_else} 
+# after special form --> operator ---> function call
+# difference b/w functiondef functioncall
 
 def read_file(file):
 	f = open(file)
