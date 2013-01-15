@@ -1,0 +1,103 @@
+Wunderlist
+***
+
+"" --> support strings
+
+Things to define:
+
+atom = string of characters/digits/symbols not starting w/ ( or )
+lat = list of atoms
+n = number
+
+What is a S-expr? 
+(zero? n)
+null? lat
+atom?
+
+
+Keywords: define, lambda, cond, else, and, or quote
+
+Rule: in expressing a function always ask null? first
+
+__________special forms____________
+1. lambda expr
+2. lexical binding/ let
+3. dynamic binding / fluid-let
+4. definition / define
+5. assignment / set!
+6. quoting / quote
+7. conditionals/ if cond and or
+8. seqeuncing / begin
+9. iteration / do let
+10. structure defn / define-structure
+11. macros
+12. ...
+
+What is a closure?
+
+1. list operations:
+	list = colelctin of S-expr enclosed by ( and )
+
+**A: car -> define for non-empty list only
+(car l)
+	- if l is empty, raises an error
+	- 
+**B: cdr (could-er)
+(cdr l)
+	- returns a list
+	- returns everything except (car l)
+	- if list has one elt, returns () 
+**C: cons
+(cons atom ls) -> returns list
+	-ls  must be a list
+	- adds atom to the front of the list ls
+
+**D: null?
+	- defined only for list
+	- (null? atom) --> no ans
+	- 
+
+**E:(length a) 
+
+	(define length
+	    (lambda (lat)
+			(cond
+				(null? lst) 0))
+				(else (add1 (length (cdr lat)))))
+**F: (member? a)
+	(define member?
+		(lambda (a lat)
+		(cond
+		((null? lat) #f)
+		(else (or (eq?(car lat) a)
+				(member? a (cdr (lat))))))))
+
+**G: lat?
+	(lat? ()) #t
+	(define lat?
+		(lambda (l)
+		(codn 
+			((null? l) #t)
+			((atom? car l))
+2. number operations
+
+(zero? n)  #t/f
+n must be a number
+if n is a list/boolean; either raise an error or does not return anything
+zero? only takes in 1 argument
+
+(null? lat) 	 #t/f
+() null special S-expression / not an atom
+
+3. atom operations
+	(eq? a b)
+	- a and b must be non-numeric atoms
+	- (eq? 6 7) no ans
+	- (eq? () ()) no ans
+
+(defin atom?
+	(lambda (x)
+	 and (not (pair? x))
+		  not (null? x)))
+pair?
+

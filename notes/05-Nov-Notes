@@ -1,0 +1,43 @@
+parser: input --> verify according to syntactic rules of the language --> translate into an internal representation
+
+    internal representation may be a tree structure
+compiler = internal representation is a sequence of executable instructions for computer
+language interpreter: 1) program /code 2) parser 3) representation 4) execution 5) output
+
+Execution: internal representation is processed according to the semantic rules of the language; carrying out computation; 
+
+syntactic keyword = identifier that names a type of syntax
+    sytanctic keyword is bound to a particular sytanx
+
+variable = identifier that names a location;
+    variable is bound to that location
+    variable's value = value stored in the location to which variable is bound
+
+binding constructs = certain expr types that are used to create new types of syntax; these bind syntactic keywords -> new syntaxes
+
+ex. lambda expression = most fundamental of the variable binding constructs
+    ex. let, let*, letrec, do
+-> all other varaible bidning constructs can be explained in terms of lambda expr
+
+(fcn_name x y) <-- special form
+
+
+<ERROR>
+Error: execute: unbound symbol:
+
+
+<6 special forms in Scheme> + 3 toher syntactic constructions (=variables, constants, and procedure calls):
+
+
+1. variable reference = var <-- symbol = value
+2. constant literal = number <-- evaluates to itself
+3. quotation (quote expr)   <-- return expr literally, no eval
+4. conditional (if test conseq alt)
+(if (conditional)(fnc1)(fnc2)) --> if true fnc1, else evaluate and return fnc2
+5. (set! var exp)
+6. (define var exp)
+    ex. (define r 3) or (define square (lambda(x)(* x x)))
+7. procedure    (lambda (var...) exp)
+    ex. (lambda (r) (* 3.14 (* r r)))
+8. (begin exp..) <-- evaluate each exp in left-to-right order then returnt he final value
+9. (proc exp..) <-- anything other than if, set!, define, lambda, begin orquote
