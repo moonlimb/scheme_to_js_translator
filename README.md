@@ -1,18 +1,13 @@
+Scheme to JavaScript Language Translator
 
-Started on 5 Nov 2012
+- written in Python
 
-This project (code in progress) will convert a Scheme code and produce a JavaScript output. 
+- includes a lexer and a paser to convert Scheme (LISP) code to an AST represented as nested lists
 
-1. Build a basic Scheme parser
+- designed an object-oriented JavaScript AST
 
-2. Build an abstract syntactic tree from Scheme
+- implemented a set of mutually recursive functions to translate Scheme ASTs to JavaScript ASTs
 
-Possibly,
-3. Convert Scheme ABT to JavaScript ABT
+- created a code generator that emits JavaScript ASTs as formatted JavaScript code
 
-4. Interpret JavaScript ABT
-
-5. Evaluate
-
-Extra: Visual interface to host my Scheme to JS converter
-
+- translator supports arithmetic operations, functions (including recursive functions), and conditional statements
