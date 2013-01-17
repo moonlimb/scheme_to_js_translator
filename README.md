@@ -1,6 +1,4 @@
-Scheme to JavaScript Language Translator
-
-- written in Python
+Scheme to JavaScript Language Translator (written in Python)
 
 - includes a lexer and a paser to convert Scheme (LISP) code to an AST represented as nested lists
 
